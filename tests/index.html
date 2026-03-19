@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tests</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            padding: 2rem;
+            background: #1a1a2e;
+            color: #ccc;
+        }
+        h1 { margin-bottom: 1rem; color: #eee; }
+        .pass { color: #4ade80; }
+        .fail { color: #f87171; font-weight: bold; }
+        .summary {
+            font-size: 1.2em;
+            margin-bottom: 1rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #333;
+        }
+        div { padding: 2px 0; }
+    </style>
+</head>
+<body>
+
+    <h1>Test Results</h1>
+    <div id="results">Running...</div>
+
+    <!-- Source files under test -->
+    <script src="../src/store/store.js"></script>
+
+    <!-- Test framework -->
+    <script src="helpers.js"></script>
+
+    <!-- Test suites — add new test files here -->
+    <script src="test-store.js"></script>
+
+    <!-- Print results -->
+    <script>TestRunner.printResults()</script>
+
+</body>
+</html>
