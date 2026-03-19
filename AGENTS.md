@@ -25,11 +25,22 @@ Rules files define standards. Project docs are generated per game. Never confuse
 
 Before implementing any request, check it against `ARCHITECTURE.md`, `DESIGN_RULES.md`, and `DESIGN.md`.
 
-**If a violation is found:**
+### Architecture violation (code)
+If the request breaks a rule from `ARCHITECTURE.md` (e.g. uses `Math.random()`, ES modules, direct state mutation from UI):
 1. **STOP** — do not write code
-2. **State** which rule is violated and why
+2. **Name** the specific rule that would be violated
 3. **Propose** 1–3 compliant alternatives
 4. **Wait** for user to confirm before proceeding
+
+### Design violation (game design)
+If the request contradicts a principle from `DESIGN_RULES.md` (e.g. dominant strategy, slogan-only fun, missing goal hierarchy, PEGI violation):
+1. **STOP** — do not modify `DESIGN.md` or write code
+2. **Name** the specific principle that would be violated (quote it)
+3. **Explain the consequences** — what will go wrong for the player if this change ships (e.g. "players will find the optimal boring strategy and stop engaging with other mechanics", "new players will have no clear goal for the first 10 minutes")
+4. **Propose 3 alternatives** — different ways to achieve the user's intent without violating the principle. Each alternative should briefly explain how it solves both the user's goal and the design concern
+5. **Wait** — do not proceed until the user picks an alternative or explicitly overrides the rule
+
+If the user insists on the original request after seeing the warning, implement it — but add a comment in `DESIGN.md` next to the affected section noting which principle was intentionally overridden and why.
 
 ---
 
@@ -46,6 +57,20 @@ Execute `TODO.md` sequentially. Mark each task done. Verify `ARCHITECTURE.md` co
 
 ### Phase 4 → Testing
 Write tests in `tests/` verifying: feature correctness against `DESIGN.md`, deterministic replay, architecture compliance. Run tests by opening `tests/index.html`. If any test fails — fix code, re-run all tests. Repeat until all pass.
+
+---
+
+## Iteration Workflow
+
+When `DESIGN.md`, `TODO.md`, and working code already exist and the user requests a change (new feature, balance tweak, mechanic removal, etc.):
+
+1. **Validate** — check the request against `DESIGN_RULES.md`, `ARCHITECTURE.md`, and current `DESIGN.md`. If violated — follow the Guard Behavior procedure (stop, explain consequences, propose 3 alternatives, wait).
+2. **Update DESIGN.md** — modify only the affected sections. Do not delete unrelated content. Validate the updated document against `DESIGN_RULES.md`. Present the changes for approval.
+3. **Update TODO.md** — append new tasks for the change. Keep completed tasks marked as done — do not remove them. Present new tasks for approval.
+4. **Implement** — execute new tasks sequentially. Mark done. Verify architecture compliance.
+5. **Test** — update existing tests if behavior changed. Write new tests for new features. Run ALL tests (old and new). Fix failures, re-run until all pass.
+
+**Never skip straight to code.** Every code change must trace back to an approved `DESIGN.md` update.
 
 ---
 

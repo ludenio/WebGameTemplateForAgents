@@ -19,13 +19,16 @@ A project template for building browser games with the help of a coding agent (C
 
 The coding agent checks every change against the architecture and design rules. If your request would violate a rule, it warns you and proposes alternatives before writing any code.
 
+For subsequent changes (new features, balance tweaks, mechanic removals), use `NEXT_ITERATION_PROMPT.md` — it ensures the agent updates `DESIGN.md` first, then plans and implements, rather than jumping straight to code.
+
 ## What's Inside
 
 ```
-├── AGENTS.md           # AI agent rules: workflow, guard behavior, coding standards
-├── ARCHITECTURE.md      # Code architecture: store API, patterns, file structure
-├── DESIGN_RULES.md      # Game design principles: balance, UX, progression, etc.
-├── FIRST_PROMPT.md      # Template for your first message to the AI agent
+├── AGENTS.md                # Coding agent rules: workflow, guard behavior, coding standards
+├── ARCHITECTURE.md          # Code architecture: store API, patterns, file structure
+├── DESIGN_RULES.md          # Game design principles: balance, UX, progression, etc.
+├── FIRST_PROMPT.md          # Template: first message to the agent (new game)
+├── NEXT_ITERATION_PROMPT.md # Template: subsequent messages (changes, new features)
 ├── src/
 │   ├── index.html       # Entry point — open in browser (works via file:///)
 │   ├── main.js          # Game loop skeleton
