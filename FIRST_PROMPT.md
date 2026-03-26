@@ -36,4 +36,8 @@ Follow the development workflow from `AGENTS.md`:
 
 Start with Phase 1 — write the game design document.
 
+## Post work .gitignore
+
+Create or update the `.gitignore` file so that only project files are committed to the Git repository, without temporary test files, logs, debug symbols, etc.
+
 ---
