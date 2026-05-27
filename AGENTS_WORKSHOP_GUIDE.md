@@ -1,3 +1,19 @@
+## 🧭 Workshop Agenda
+
+In this workshop, you will go from a game idea to a playable link you can share with other people.
+
+You will:
+
+1.  Create or open the accounts and apps you need.
+2.  Make your own copy of the game template.
+3.  Ask an AI Agent to turn your idea into a small browser game.
+4.  Open the game on your computer and make changes to it.
+5.  Publish the game online with one simple command.
+
+The main goal is not only to make a game. The goal is to add new tools to your personal "inventory": tools you can later use for many different tasks. For example, you can use an AI agent to automate something you often do by hand, create an autochecker for things that need to be free of mistakes, build a website or app, or simply build something fun.
+
+---
+
 ## 🎨 Basic Concepts: Developer Dictionary
 
 Before installing anything, let's quickly understand what we are working with:
@@ -180,6 +196,21 @@ npx surge ./src my-game-name.surge.sh
 Surge will upload the files again, and after a few seconds the link will open the new version of the game.
 
 ---
+
+### Workshop Recap
+
+During this workshop, you created a small project, asked an AI Agent to work with files on your computer, tested the result in a browser, changed the project through another prompt, and published it online as a shareable link.
+
+The most important takeaway is this: you now have a new set of tools in your personal inventory.
+
+You can use the same approach later to:
+
+* automate tasks you often repeat by hand;
+* check files, text, data, or project rules where mistakes often happen;
+* create a simple game, website, app, prototype, or personal tool;
+* experiment, learn, and have fun making things faster than before.
+
+You do not need to become a professional programmer overnight. Just start building by asking your agent. The more you practice, the better you will understand what an AI Agent can do for you.
 
 ### What Next?
 
