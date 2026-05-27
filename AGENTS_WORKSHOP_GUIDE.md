@@ -125,8 +125,6 @@ Publish my browser game with Surge.
 Important:
 - the game is inside the src folder;
 - publish only ./src, not the whole project folder;
-- do not build or prepare anything extra before publishing;
-- the command should work on my operating system: {Windows / macOS / Linux};
 - if Node.js or npx is not installed, explain in simple words how I can install it;
 - if the terminal asks for email/password/domain for Surge, stop and ask me to enter them myself. Do not invent a password and do not save the password into project files.
 
@@ -134,29 +132,7 @@ My Surge details:
 - email: {YOUR_EMAIL_OR_SEPARATE_EMAIL}
 - domain: {GAME_NAME}.surge.sh
 
-I will type the password myself in the terminal when Surge asks for it.
-
-After publishing, tell me the final game link.
-```
-
-Example filled-in version:
-
-```text
-Publish my browser game with Surge.
-
-Important:
-- the game is inside the src folder;
-- publish only ./src, not the whole project folder;
-- do not build or prepare anything extra before publishing;
-- the command should work on my operating system: Windows;
-- if Node.js or npx is not installed, explain in simple words how I can install it;
-- if the terminal asks for email/password/domain for Surge, stop and ask me to enter them myself. Do not invent a password and do not save the password into project files.
-
-My Surge details:
-- email: test-game@example.com
-- domain: my-coin-quest.surge.sh
-
-I will type the password myself in the terminal when Surge asks for it.
+I will provide the password myself if Surge asks for it.
 
 After publishing, tell me the final game link.
 ```
