@@ -2,6 +2,12 @@
 
 A project template for building browser games with the help of a coding agent (Cursor Agent, Codex, Claude Code, etc.). You describe the game — the agent writes the design doc, plans the tasks, implements the code, and tests it, all within strict architecture and design rules baked into the repo.
 
+## New to Coding Agents?
+
+If you have little or no technical background, start with [`AGENTS_WORKSHOP_GUIDE.md`](AGENTS_WORKSHOP_GUIDE.md). It is a beginner-friendly step-by-step workshop guide that explains what GitHub, GitHub Desktop, Codex/Cursor/VS Code agents, and publishing are, then walks you from a first idea to a playable browser game link.
+
+The guide is written for people who are just getting comfortable with AI agents and want to understand the workflow without needing to read code first.
+
 ## How It Works
 
 1. Clone this repo
@@ -25,6 +31,7 @@ For subsequent changes (new features, balance tweaks, mechanic removals), use `N
 
 ```
 ├── AGENTS.md                # Coding agent rules: workflow, guard behavior, coding standards
+├── AGENTS_WORKSHOP_GUIDE.md # Beginner-friendly workshop guide for learning the agent workflow
 ├── ARCHITECTURE.md          # Code architecture: store API, patterns, file structure
 ├── DESIGN_RULES.md          # Game design principles: balance, UX, progression, etc.
 ├── FIRST_PROMPT.md          # Template: first message to the agent (new game)
