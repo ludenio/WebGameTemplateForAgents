@@ -8,7 +8,7 @@ You will:
 2.  Make your own copy of the game template.
 3.  Ask an AI Agent to turn your idea into a small browser game.
 4.  Open the game on your computer and make changes to it.
-5.  Publish the game online with one simple command.
+5.  Ask the Agent to publish the game online so other people can play it by link.
 
 The main goal is not only to make a game. The goal is to add new tools to your personal "inventory": tools you can later use for many different tasks. For example, you can use an AI agent to automate something you often do by hand, create an autochecker for things that need to be free of mistakes, build a website or app, or simply build something fun.
 
@@ -21,9 +21,9 @@ Before installing anything, let's quickly understand what we are working with:
 * **Git:** A “save history” system for a whole folder. If the AI changes something and the game breaks, Git can help you go back to an earlier working version.
 * **GitHub:** A cloud service for storing projects. Think of it like Google Drive or Dropbox, but made especially for code and project files.
 * **GitHub Desktop:** A friendly app with buttons for GitHub. It lets you download the template and save changes without typing Git commands.
-* **Codex App (or Cursor / VS Code):** The app where you open the game folder and talk to the AI assistant. You do not need to read or understand the code yourself.
-* **Agent:** The AI assistant inside Codex / Cursor / VS Code. It is very similar to ChatGPT in a browser: you write a message, and it answers. The difference is that this Agent can also change files inside the project folder on your computer. You describe what you want in normal language, and the Agent edits the project files for you.
-* **Terminal:** An app where commands can be typed. In this guide, you only need it for one publishing command, and you can ask the Agent to help with it.
+* **Agent app:** An app where you open the game folder and talk to the AI assistant. Use any agent app that can read and edit files in a local folder. You do not need to read or understand the code yourself.
+* **Agent:** The AI assistant inside your agent app. It works like a chat: you write a message, and it answers. The difference is that this Agent can also change files inside the project folder on your computer. You describe what you want in normal language, and the Agent edits the project files for you.
+* **Terminal:** An app where commands can be typed. In this guide, you do not need to use it directly for the main path. The Agent may use it for you and ask you to approve actions.
 
 ---
 
@@ -43,11 +43,11 @@ This app is useful for downloading templates and saving your game projects on yo
 3.  On first launch, click **Sign in to GitHub.com**.
 4.  A browser window will open. Click the green **Authorize desktop** button to connect GitHub Desktop to your new GitHub account.
 
-## 🤖 Step 3. Install Codex
+## 🤖 Step 3. Install an Agent App
 
-1.  Download the **Codex** installer. It is usually available from the official OpenAI website or through an early-access link if it is still in beta. *Cursor or VS Code with a Copilot-like plugin can also be used as alternatives.*
+1.  Choose an agent app that can open a local project folder, edit files, and run terminal commands after you approve them. If a workshop host, teacher, or team gave you a specific app, use that one.
 2.  Install the app on your computer.
-3.  When the app starts, sign in with your OpenAI account — the same login and password you use for ChatGPT.
+3.  When the app starts, sign in with the account required by that app.
 
 ## 🎨 Step 4. Create Your Own Project from the Template
 
@@ -59,15 +59,15 @@ We will not write the game from scratch. Instead, we will use a starter template
 4.  You are now on the page of your own copy of the project. Click the green **Code** button and choose **Open with GitHub Desktop**.
 5.  GitHub Desktop will open and ask where to save the game folder. Choose a convenient location on your computer and click **Clone**. “Clone” just means “download this project to my computer.”
 
-## 🚀 Step 5. Work in Codex: Create the Game
+## 🚀 Step 5. Work in Your Agent App: Create the Game
 
 Now the magic begins. Your job is to generate ideas; the Agent will do the technical work.
 
-1.  Open the installed **Codex** app.
-2.  Click **Open Folder** and choose the game folder you just downloaded through GitHub Desktop.
-3.  Open the file **`FIRST_PROMPT.md`** inside the project folder. You can open it in Codex or in any text editor.
+1.  Open the installed agent app.
+2.  Click **Open Folder** and choose the game folder you just downloaded through GitHub Desktop. If you do not see this button, use the application menu instead: **File** → **Open Folder**.
+3.  Open the file **`FIRST_PROMPT.md`** inside the project folder. You can open it in your agent app or in any text editor.
 4.  Find the place in the file where it asks for your game idea. Replace that text with your own idea: how the game looks, what the player does, and who the main character is. You can write in simple language. For example: “Top-down view: the character explores a small island, collects coins, helps villagers find lost items, unlocks new areas, and upgrades tools to move faster.”
-5.  Copy the whole text from this file and send it to the Agent in the Codex chat.
+5.  Copy the whole text from this file and send it to the Agent in your agent chat.
 
 The Agent will read the project instructions and work in 4 steps:
 
@@ -78,55 +78,59 @@ The Agent will read the project instructions and work in 4 steps:
 
 *If your idea does not fit the technical rules of the template, for example if you ask for multiplayer and the template does not support it, the Agent will warn you in advance and suggest alternatives.*
 
+When the Agent shows you `DESIGN.md`, `TODO.md`, or another checkpoint and asks whether to continue, you can approve the next step with:
+
+```text
+I approve, continue.
+```
+
+Use that only when the result looks good enough to continue. If something is wrong, ask the Agent to change it before approving.
+
 ## 🎮 Step 6. How to Play and Make Changes
 
 * **How to run the game:** No servers are needed. Open the game folder on your computer, go into the `src` folder, and double-click **`index.html`**. The game will open in your browser.
 * **How to change the game:** Open **`NEXT_ITERATION_PROMPT.md`**, write what you want to change, and send the full text to the Agent in a new chat. For example: “Add coins, a small shop, and three upgrades: faster movement, bigger backpack, and a magnet that pulls nearby coins toward the player.”
 
-To create a new chat in Codex, find your game folder in the app, hover over it, and click the notebook-with-pencil icon. You can think of it like this: many chats can work with the same project folder. The Agent will update the documents and carefully change the code for you.
+To create a new chat, look for a button named **New Chat**, **New Task**, **New Conversation**, or something similar in your agent app. You can think of it like this: many chats can work with the same project folder. The Agent will update the documents and carefully change the code for you.
 
 ---
 
-## 🌐 Step 7. Publish the Game with Surge
+## 🌐 Step 7. Ask the Agent to Publish the Game
 
-When the game already runs on your computer and you want to send a link to a friend, the simplest option is to publish the `src` folder with **Surge**.
+When the game already runs on your computer and you want to send a link to a friend, ask the Agent to publish it for you.
 
-Surge is a service that puts simple websites online. Our game is a simple website made from files in the `src` folder. Publishing is usually done with one terminal command:
+This step shows an important idea: an Agent can do more than write text and edit project files. It can also use tools, run terminal commands, check what is installed on your computer, and guide you through missing setup.
 
-```bash
-npx surge ./src my-game-name.surge.sh
-```
+For this workshop we will use **Surge**, a service that puts simple websites online. You do not need to open the terminal yourself. Copy the prompt below, answer the Agent's questions, and approve actions when your agent app asks you to.
 
-After that, the game will be available at:
+### 7.1. Before You Ask the Agent
 
-```text
-https://my-game-name.surge.sh
-```
+Prepare three things:
 
-Here, `npx` is just a helper command that runs Surge. You do not need to understand how it works.
-
-### 7.1. What You Need to Know Before Publishing
-
-Surge may ask for:
-
-* **email** — used to create or log into a Surge account. You can use your real email, a separate email for experiments, or an email alias. A fake-looking email may work for a throwaway experiment, but you may not be able to recover the account later.
-* **password** — create a new password just for Surge. Do not reuse your GitHub, email, or social media password.
+* **email** — used to create or log into a Surge account.
+* **password** — create a new password just for Surge. Do not reuse your GitHub, email, or social media password. This is not a "system password" from the guide.
 * **domain** — the public site address, for example `my-coin-quest.surge.sh`.
 
-These details go only to **Surge**. They are not written into the game code. Other players will only see the final public link.
+Other players will only see the final public link. These details are not written into the game code.
 
-### 7.2. How to Ask Your AI Agent to Publish the Game
+### 7.2. Copy This Prompt to the Agent
 
-Open a chat with the Agent in Codex / Cursor / VS Code and send this text. You do not need to understand every technical word inside it — the text is written for the Agent. Replace the values in `{curly braces}` with your own:
+Replace the values in `{curly braces}` with your own:
 
 ```text
-Publish my browser game with Surge.
+Publish my browser game on the web with Surge so I can send a playable link to a friend.
 
 Important:
 - the game is inside the src folder;
 - publish only ./src, not the whole project folder;
-- if Node.js or npx is not installed, explain in simple words how I can install it;
-- if the terminal asks for email/password/domain for Surge, stop and ask me to enter them myself. Do not invent a password and do not save the password into project files.
+- use your tools and terminal access to do the publishing for me, not just explain the commands;
+- first check whether node and npx are installed;
+- if node or npx is missing, help me install the Node.js LTS version for my operating system, then check again;
+- when ready, run: npx --yes surge ./src {GAME_NAME}.surge.sh;
+- if my agent app asks me to approve a command, wait for my approval;
+- if Surge asks for email or domain, you may enter the values below;
+- if Surge asks for a password, stop and tell me exactly where to type it myself;
+- do not invent a password and do not save the password into project files.
 
 My Surge details:
 - email: {YOUR_EMAIL_OR_SEPARATE_EMAIL}
@@ -137,39 +141,29 @@ I will provide the password myself if Surge asks for it.
 After publishing, tell me the final game link.
 ```
 
-### 7.3. If You Want to Run the Command Yourself
-
-Open a terminal in the project folder and run:
-
-```bash
-npx surge ./src my-game-name.surge.sh
-```
-
-Here, `my-game-name` is a short name for your game using Latin letters and no spaces. For example:
-
-```bash
-npx surge ./src my-coin-quest.surge.sh
-```
-
-If Surge asks:
+If your agent app asks whether you approve a terminal command, you can answer:
 
 ```text
-email:
-password:
-domain:
+I approve, run it.
 ```
 
-enter your email, a new password for Surge, and a domain like `your-game-name.surge.sh`.
+After publishing, the game will be available at a link like:
 
-### 7.4. How to Update the Online Game After New Changes
+```text
+https://my-coin-quest.surge.sh
+```
 
-Every time Codex changes the game and you want to update the online version, run the same command again:
+### 7.3. If You Already Know the Terminal
+
+You can also publish manually. Open a terminal in the project folder and run:
 
 ```bash
-npx surge ./src my-game-name.surge.sh
+npx --yes surge ./src my-game-name.surge.sh
 ```
 
-Surge will upload the files again, and after a few seconds the link will open the new version of the game.
+Replace `my-game-name` with a short name using Latin letters and no spaces. To update the online game after later changes, run the same command again.
+
+If your terminal says `command not found: npx`, install the **LTS** version of Node.js from `nodejs.org`, then close and reopen the terminal.
 
 ---
 
@@ -190,4 +184,4 @@ You do not need to become a professional programmer overnight. Just start buildi
 
 ### What Next?
 
-After you get comfortable and make a few iterations of your game, you may become curious about how everything works. You can read the files inside the project or ask Codex questions about them. Step by step, this will help you move beyond the basic “ask in chat → receive an answer” workflow.
+After you get comfortable and make a few iterations of your game, you may become curious about how everything works. You can read the files inside the project or ask the Agent questions about them. Step by step, this will help you move beyond the basic “ask in chat → receive an answer” workflow.
