@@ -56,7 +56,7 @@
         <button class="tab-btn" data-tab="first">1. First prompt</button>
         <button class="tab-btn" data-tab="next">2. Change a game</button>
         <button class="tab-btn" data-tab="publish">3. Publish online</button>
-        <button class="tab-btn" data-tab="steps">4. Workshop recap</button>
+        <button class="tab-btn" data-tab="steps">4. Checklist</button>
     </nav>
 
     <!-- ============ TAB: Agent vs chat (intro) ============ -->
@@ -187,7 +187,7 @@
                 <div class="tutorial-celebrate-icon" aria-hidden="true"><img src="Nikol.ai.svg" alt=""><span class="tutorial-celebrate-check">&#10003;</span></div>
                 <h3 class="tutorial-celebrate-title">Chat vs agent</h3>
                 <p class="tutorial-celebrate-text">You now know how <strong>chats</strong> differ from <strong>agents</strong>. Let&rsquo;s use an agent to build our game.</p>
-                <button type="button" class="btn" id="tutorial-continue-btn">First prompt</button>
+                <button type="button" class="btn" id="tutorial-continue-btn">Checklist</button>
             </div>
         </div>
 
@@ -238,7 +238,7 @@
         </div>
         <pre class="preview" id="preview-first"></pre>
 
-        <div class="note">After you paste this, the agent will ask you to approve its plan. When you are happy, reply with an approval phrase from tab <strong>4. Workshop recap</strong>.</div>
+        <div class="note">After you paste this, the agent will ask you to approve its plan. When you are happy, reply with an approval phrase from tab <strong>4. Checklist</strong>.</div>
     </section>
 
     <!-- ============ TAB: Next iteration ============ -->
@@ -295,9 +295,9 @@
         <div class="note">The <code>.surge.sh</code> ending is fixed — you only choose the name in front of it. As you type, the address is checked live so you can see whether it is free or already taken before you publish. If you fill in a password it is added to the prompt so the agent can log in without stopping, so use a <strong>throwaway password</strong> you do not reuse elsewhere. Leave it blank and the agent will instead pause and let you type the password yourself. Either way, never let the password get saved into project files.</div>
     </section>
 
-    <!-- ============ TAB: Workshop recap (checklist) ============ -->
+    <!-- ============ TAB: Checklist ============ -->
     <section class="tab-section panel" data-tab="steps">
-        <h2>Workshop recap</h2>
+        <h2>Checklist</h2>
         <p class="hint">Check off what you&rsquo;ve done. Progress is saved in this browser. Come back here at the end of the workshop.</p>
 
         <div class="progress"><span id="progress-bar"></span></div>
@@ -339,6 +339,9 @@
     <footer class="site">
         <img class="footer-mascot" src="Nikol.ai.svg" alt="" aria-hidden="true" width="100" height="84">
         <a href="https://github.com/ludenio/WebGameTemplateForAgents/blob/main/AGENTS_WORKSHOP_GUIDE.md">Workshop guide (AGENTS_WORKSHOP_GUIDE.md)</a>
+        <a class="github-link" href="https://github.com/ludenio/WebGameTemplateForAgents" aria-label="GitHub repository">
+            <img class="footer-github" src="GitHub_Lockup_White.svg" alt="GitHub" width="120" height="27">
+        </a>
     </footer>
 
 </div>

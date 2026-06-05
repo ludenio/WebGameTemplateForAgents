@@ -4,7 +4,9 @@ A project template for building browser games with the help of a coding agent. U
 
 ## New to Coding Agents?
 
-If you have little or no technical background, start with [`AGENTS_WORKSHOP_GUIDE.md`](AGENTS_WORKSHOP_GUIDE.md). It is a beginner-friendly step-by-step workshop guide that explains what GitHub, GitHub Desktop, coding agents, and publishing are, then walks you from a first idea to a playable browser game link.
+If you have little or no technical background, start with the [Workshop Console](https://ludenio.github.io/WebGameTemplateForAgents/) — an interactive page with copy-paste prompts — or read [`AGENTS_WORKSHOP_GUIDE.md`](AGENTS_WORKSHOP_GUIDE.md). It is a beginner-friendly step-by-step workshop guide that explains what GitHub, GitHub Desktop, coding agents, and publishing are, then walks you from a first idea to a playable browser game link.
+
+The guide is written for people who are just getting comfortable with AI agents and want to understand the workflow without needing to read code first.
 
 The guide is written for people who are just getting comfortable with AI agents and want to understand the workflow without needing to read code first.
 

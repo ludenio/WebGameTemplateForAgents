@@ -1446,4 +1446,15 @@ footer.site .footer-mascot {
 }
 footer.site .footer-mascot:hover { transform: translateY(-3px) rotate(3deg); }
 footer.site a { color: var(--text-2); }
+footer.site .github-link {
+    display: inline-flex;
+    opacity: 0.72;
+    transition: opacity 0.2s ease;
+}
+footer.site .github-link:hover { opacity: 1; }
+footer.site .footer-github {
+    display: block;
+    height: 28px;
+    width: auto;
+}
 footer.site code { font-size: 0.85em; }

@@ -704,9 +704,9 @@
         }
     }
 
-    function goToFirstGameTab() {
-        switchToTab('first')
-        var section = document.querySelector('.tab-section[data-tab="first"]')
+    function goToChecklistTab() {
+        switchToTab('steps')
+        var section = document.querySelector('.tab-section[data-tab="steps"]')
         if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
 
@@ -792,7 +792,7 @@
 
     function initTutorialCelebrate() {
         var btn = $('tutorial-continue-btn')
-        if (btn) btn.addEventListener('click', goToFirstGameTab)
+        if (btn) btn.addEventListener('click', goToChecklistTab)
         var resetBtn = $('reset-story')
         if (resetBtn) resetBtn.addEventListener('click', resetStoryTutorial)
     }
