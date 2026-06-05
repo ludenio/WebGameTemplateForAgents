@@ -664,6 +664,47 @@ pre.preview {
     0%   { transform: translateY(0) translateX(0) rotate(0deg); opacity: 1; }
     100% { transform: translateY(220px) translateX(var(--drift, 0)) rotate(520deg); opacity: 0; }
 }
+
+/* Workshop complete — radial firework bursts */
+.fireworks-host { z-index: 0; }
+.firework-burst {
+    position: absolute;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+.firework-flash {
+    position: absolute;
+    left: -8px;
+    top: -8px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    animation: firework-flash 0.4s ease-out forwards;
+}
+@keyframes firework-flash {
+    0%   { transform: scale(0.2); opacity: 1; }
+    40%  { transform: scale(2.8); opacity: 0.85; }
+    100% { transform: scale(3.5); opacity: 0; }
+}
+.firework-particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    box-shadow: 0 0 5px 1px currentColor;
+    animation: firework-particle 1.9s cubic-bezier(0.12, 0.65, 0.25, 1) forwards;
+}
+@keyframes firework-particle {
+    0%   { transform: translate(0, 0) scale(0); opacity: 0; }
+    6%   { transform: translate(0, 0) scale(1.3); opacity: 1; }
+    18%  { transform: translate(var(--tx), var(--ty)) scale(1); opacity: 1; }
+    100% { transform: translate(calc(var(--tx) * 0.72), calc(var(--ty) + var(--fall))) scale(0.1); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .firework-flash,
+    .firework-particle { animation: none; opacity: 0; }
+}
 .tutorial-celebrate-card {
     position: relative;
     z-index: 1;
@@ -751,11 +792,21 @@ pre.preview {
 }
 .intro-outro strong { color: var(--text-2); font-weight: 600; }
 
-/* Scene 1: IDE-style file explorer + editor */
+/* Scene 1: desktop-style file icons + preview */
 .file-explorer,
 .file-manager {
     min-height: 160px;
     max-height: 280px;
+}
+/* Step 2 — taller panel so file preview is readable */
+#story-step-2 .demo-file,
+#story-step-2 .file-manager {
+    min-height: 320px;
+    max-height: 420px;
+}
+#story-step-2 .demo-chat {
+    min-height: 320px;
+    max-height: 380px;
 }
 .fe-head {
     display: flex;
@@ -791,99 +842,81 @@ pre.preview {
     min-height: 0;
     overflow: hidden;
 }
-.fe-tree {
+.fe-icon-grid {
     flex: 0 0 auto;
-    min-height: 0;
-    overflow-y: auto;
+    min-height: 96px;
+    padding: 10px 8px 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
 }
-/* Before the agent creates a file: compact empty explorer (header only). */
-.demo-project-empty .fe-body {
-    min-height: 120px;
+.file-manager:not(.has-file) .fe-icon-grid {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.file-manager.has-file .fe-icon-grid {
+    min-height: 0;
+    max-height: 118px;
 }
 .fe-empty-hint {
     margin: 0;
-    padding: 28px 12px;
+    padding: 8px 12px;
     font-size: 12px;
     line-height: 1.45;
     color: var(--muted);
     text-align: center;
 }
-.file-manager:not(.has-file) .fe-tree {
-    flex: 0 0 0;
-    max-height: 0;
-    padding: 0;
-    overflow: hidden;
-}
-.file-manager:not(.has-file) .fe-list {
-    min-height: 0;
-}
-.file-manager.has-file .fe-tree {
-    padding: 2px 0 3px;
-    max-height: 5.5rem;
-    flex: 0 0 auto;
-}
-.fe-list {
+.file-manager.has-file .fe-empty-hint { display: none; }
+.fe-grid {
     list-style: none;
     margin: 0;
     padding: 0;
-}
-.fe-nested {
-    padding-left: 0;
-    margin-left: 14px;
-    border-left: 1px solid rgba(255, 255, 255, 0.06);
-}
-.fe-node.fe-file {
     display: flex;
+    flex-wrap: wrap;
+    gap: 4px 2px;
+    justify-content: flex-start;
+    align-content: flex-start;
+}
+.file-manager:not(.has-file) .fe-grid { display: none; }
+.fe-grid-item {
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 0 4px;
-    padding: 1px 6px 1px 4px;
-    font-family: var(--mono);
-    font-size: 11px;
-    line-height: 1.3;
-    color: var(--text-2);
+    gap: 5px;
+    width: 74px;
+    padding: 6px 4px 5px;
+    border-radius: 8px;
+    border: 1px solid transparent;
     cursor: pointer;
     user-select: none;
+    text-align: center;
+    transition: background 0.15s ease, border-color 0.15s ease;
 }
-.fe-node.fe-folder {
-    display: block;
-    padding: 2px 8px 2px 4px;
-    font-family: var(--mono);
-    font-size: 11.5px;
-    line-height: 1.55;
-    color: var(--text-2);
-    cursor: default;
-    user-select: none;
+.fe-icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
 }
-.fe-node.fe-folder > .fe-guide,
-.fe-node.fe-folder > .fe-icon,
-.fe-node.fe-folder > .fe-name {
-    display: inline-block;
-    vertical-align: middle;
-    margin-right: 5px;
-}
-.fe-node.fe-folder > .fe-name { color: var(--text); font-weight: 500; }
-.fe-node.fe-folder > .fe-list { display: block; width: 100%; }
-.fe-guide {
-    flex-shrink: 0;
-    width: 1.35em;
-    color: var(--faint);
+.fe-label {
     font-size: 10.5px;
-    opacity: 0.65;
-    text-align: right;
-}
-.fe-name {
-    flex: 1;
-    min-width: 0;
+    line-height: 1.25;
+    color: var(--text-2);
+    max-width: 68px;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    word-break: break-word;
 }
 .fe-icon {
     flex-shrink: 0;
-    width: 14px;
-    height: 14px;
-    border-radius: 2px;
+    width: 32px;
+    height: 40px;
+    border-radius: 4px;
     position: relative;
 }
 /* Folder — amber tab */
@@ -909,12 +942,12 @@ pre.preview {
 .fe-i-md::after {
     content: "";
     position: absolute;
-    right: 2px;
-    bottom: 2px;
-    width: 5px;
-    height: 5px;
-    border-right: 1.5px solid rgba(110, 139, 255, 0.8);
-    border-bottom: 1.5px solid rgba(110, 139, 255, 0.8);
+    right: 3px;
+    bottom: 3px;
+    width: 7px;
+    height: 7px;
+    border-right: 2px solid rgba(110, 139, 255, 0.8);
+    border-bottom: 2px solid rgba(110, 139, 255, 0.8);
 }
 /* HTML — orange */
 .fe-i-html {
@@ -928,7 +961,7 @@ pre.preview {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 5px;
+    font-size: 7px;
     font-weight: 700;
     color: rgba(245, 180, 120, 0.95);
     letter-spacing: -0.5px;
@@ -945,7 +978,7 @@ pre.preview {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 5.5px;
+    font-size: 8px;
     font-weight: 800;
     color: rgba(245, 210, 100, 0.95);
 }
@@ -961,35 +994,43 @@ pre.preview {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 4.5px;
+    font-size: 7px;
     font-weight: 700;
     color: var(--muted);
     letter-spacing: -0.3px;
 }
-.file-manager.has-file .fe-agent-file {
-    display: flex;
-    animation: fade-in 0.25s ease;
+.fe-agent-file.is-appearing {
+    animation: fe-appear 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
-.file-manager.has-file .fe-agent-file.is-active {
-    background: rgba(110, 139, 255, 0.12);
-    color: var(--text);
+.fe-agent-file.is-removing {
+    animation: fe-remove 0.28s ease forwards;
+    pointer-events: none;
 }
-.file-manager.has-file .fe-agent-file.is-active .fe-name { color: #d6ffe4; }
-.file-manager.has-file .fe-agent-file.is-new .fe-name {
+@keyframes fe-appear {
+    from { opacity: 0; transform: scale(0.55); }
+    to   { opacity: 1; transform: scale(1); }
+}
+@keyframes fe-remove {
+    from { opacity: 1; transform: scale(1); }
+    to   { opacity: 0; transform: scale(0.45); }
+}
+.fe-grid-item.is-active {
+    background: rgba(110, 139, 255, 0.14);
+    border-color: rgba(110, 139, 255, 0.38);
+}
+.fe-grid-item.is-active .fe-label { color: #d6ffe4; }
+.fe-grid-item.is-new .fe-label {
     color: #d6ffe4;
     animation: flash-line 1.2s ease;
 }
-.fe-editor {
-    display: none;
+.fe-preview {
+    display: flex;
+    flex-direction: column;
     border-top: 1px solid var(--border);
     flex: 1 1 0;
     min-height: 0;
     overflow: hidden;
-}
-.file-manager.has-file .fe-editor {
-    display: flex;
-    flex-direction: column;
-    animation: fade-in 0.3s ease;
+    animation: fade-in 0.28s ease;
 }
 .file-manager.has-file .fe-body {
     flex: 1 1 0;
@@ -1001,7 +1042,7 @@ pre.preview {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
 }
-.fe-tab {
+.fe-preview-head {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -1011,12 +1052,18 @@ pre.preview {
     background: var(--panel-2);
     border-bottom: 1px solid var(--border);
     padding: 6px 10px;
+    flex-shrink: 0;
 }
-.fe-tab .fe-icon { width: 12px; height: 12px; }
-.file-manager.has-file .fe-tab {
+.fe-preview-head .fe-icon { width: 14px; height: 17px; border-radius: 3px; }
+.fe-preview .fe-preview-head {
     color: #d6ffe4;
     background: rgba(74, 222, 128, 0.1);
     border-bottom-color: rgba(74, 222, 128, 0.25);
+}
+@media (prefers-reduced-motion: reduce) {
+    .fe-agent-file.is-appearing,
+    .fe-agent-file.is-removing,
+    .fe-preview { animation: none; }
 }
 
 .demo-input-row {

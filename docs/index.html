@@ -91,15 +91,16 @@
                 <div class="demo-chat" id="ag-chat"></div>
                 <div class="demo-file file-explorer file-manager" id="ag-fm">
                     <div class="fe-head">
-                        <span class="fe-head-label">Explorer</span>
+                        <span class="fe-head-label">Project Files</span>
                         <span class="fe-root" title="Project root">WebGameTemplate</span>
                     </div>
                     <div class="fe-body">
-                        <div class="fe-tree" role="tree" aria-label="Project files">
-                            <ul class="fe-list" id="ag-tree-list" role="group"></ul>
+                        <div class="fe-icon-grid" aria-label="Project files">
+                            <p class="fe-empty-hint" id="ag-fm-empty">Files appear here as the agent works on your project.</p>
+                            <ul class="fe-grid" id="ag-tree-list" role="list"></ul>
                         </div>
-                        <div class="fe-editor" id="ag-open">
-                            <div class="fe-tab" id="ag-tab"><span class="fe-icon fe-i-txt" aria-hidden="true"></span><span id="ag-tab-name"></span></div>
+                        <div class="fe-preview" id="ag-open" hidden>
+                            <div class="fe-preview-head" id="ag-tab"><span class="fe-icon fe-i-txt" aria-hidden="true"></span><span id="ag-tab-name"></span></div>
                             <pre class="demo-file-body" id="ag-file"></pre>
                         </div>
                     </div>
@@ -114,9 +115,9 @@
             </div>
         </div>
 
-        <!-- Step 3: agent runs commands on your machine -->
+        <!-- Step 3: agent writes tests, runs them, then builds -->
         <div class="demo-stage demo-stage-locked" data-story-step="3" id="story-step-3">
-            <div class="demo-stage-head"><span class="demo-step-badge alt2">3</span> Agent — run commands<button type="button" class="demo-skip chip" data-skip-step="3">Skip</button></div>
+            <div class="demo-stage-head"><span class="demo-step-badge alt2">3</span> Agent — tests &amp; build<button type="button" class="demo-skip chip" data-skip-step="3">Skip</button></div>
             <p class="demo-stage-lock-msg">Finish step 2.</p>
             <div class="demo-stage-body">
             <div class="demo-grid">
@@ -137,9 +138,9 @@
             </div>
         </div>
 
-        <!-- Step 4: agent plays the game and checks expectations -->
+        <!-- Step 4: playable build opens in the browser -->
         <div class="demo-stage demo-stage-locked" data-story-step="4" id="story-step-4">
-            <div class="demo-stage-head"><span class="demo-step-badge alt3">4</span> Agent — play-test<button type="button" class="demo-skip chip" data-skip-step="4">Skip</button></div>
+            <div class="demo-stage-head"><span class="demo-step-badge alt3">4</span> Agent — play the game<button type="button" class="demo-skip chip" data-skip-step="4">Skip</button></div>
             <p class="demo-stage-lock-msg">Finish step 3.</p>
             <div class="demo-stage-body">
             <div class="demo-grid">
@@ -327,7 +328,7 @@
         </div>
 
         <div class="tutorial-celebrate" id="steps-celebrate" hidden>
-            <div class="tutorial-celebrate-confetti" id="steps-confetti" aria-hidden="true"></div>
+            <div class="tutorial-celebrate-confetti fireworks-host" id="steps-confetti" aria-hidden="true"></div>
             <div class="tutorial-celebrate-card">
                 <div class="tutorial-celebrate-icon" aria-hidden="true"><img src="Nikol.ai.svg" alt=""><span class="tutorial-celebrate-check">&#10003;</span></div>
                 <h3 class="tutorial-celebrate-title">Workshop complete</h3>

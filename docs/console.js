@@ -372,9 +372,9 @@
     //
     // One fictional game across four locked steps (unlock in order):
     //   1. Plain chat — ask to build the game; chat only describes an idea
-    //   2. Agent — creates 4 project files (fixed count, then locks)
-    //   3. Agent — runs tests/index.html
-    //   4. Agent — play-tests src/index.html against DESIGN.md
+    //   2. Agent — creates project files; user wants to play → agent explains build
+    //   3. User asks to build → agent writes tests → runs tests → builds
+    //   4. Built game is shown; user asks to play → agent play-tests it
 
     var storyFlow = { unlockedMax: 1, done: {} }
     var storyStepControls = {}
@@ -385,10 +385,15 @@
         sparksGoal: 3,
         firstPrompt: 'Build me Platform Hopper — a browser game: hop moving platforms, avoid pits, reach the exit',
         chatReply: 'I can\'t build games or create files in your project — chat only. Idea: Platform Hopper, a side-scrolling factory platformer (moving platforms, pits, sparks, exit).',
-        testRunPrompt: 'Write tests and run them',
-        testExplain: 'As an agent I work with programs that print text — I don\'t see the game on screen the way you do. For me it\'s lines of output. So I run technical tests first: they report pass or fail, and that\'s how I know the game works before we open it in a browser.',
-        testApprovePrompt: 'I approve, continue.',
-        playtestPrompt: 'Play it and tell me if everything looks right',
+        buildRequestPrompt: 'Let\'s build the game.',
+        buildPitch: 'I can build it — that packages the source into something you can open in a browser and play. First I\'d like to write automated tests: as an agent I verify correctness through test output, not by looking at the screen — that\'s how I know everything works before we build.',
+        writeTestsPrompt: 'Good idea, let\'s create auto-tests.',
+        testsWritten: 'Automated tests are written — ready to run them.',
+        runTestsPrompt: 'Run the auto-tests.',
+        testsPass: 'All tests passed — everything works. Ready to build.',
+        buildAndPlayPrompt: 'Yes, let\'s build the game.',
+        buildDone: 'Build complete — you can play now.',
+        playtestPrompt: 'Let\'s play the game.',
         ideaLines: [
             'Game: Platform Hopper',
             '',
@@ -462,15 +467,18 @@
                 ]
             },
             {
-                special: 'approval-gate',
-                prompt: 'Check if the game really working',
-                aiAsk: 'We could write tests and check — that way I\'d know for sure the game works. Approve?',
-                approvePrompt: 'I approve, continue.',
-                aiOk: 'Approved.'
+                special: 'want-to-play',
+                prompt: 'Let\'s play!',
+                ai: 'The game code is in src/, but you can\'t play it yet — we still need a build. That\'s the step where source files turn into something you can open in a browser and actually play.'
             }
         ]
     }
     WORKSHOP_GAME.agentSteps[0].lines = WORKSHOP_GAME.ideaLines
+
+    function fileBasename(path) {
+        var i = path.lastIndexOf('/')
+        return i >= 0 ? path.slice(i + 1) : path
+    }
 
     function renderLines(el, lines, highlight) {
         // highlight: undefined | a line index | the string 'all'
@@ -634,6 +642,41 @@
         for (var i = 0; i < nodes.length; i++) nodes[i].disabled = true
     }
 
+    function needsScrollIntoView(el, margin) {
+        if (!el) return false
+        margin = margin == null ? 20 : margin
+        var rect = el.getBoundingClientRect()
+        var vh = window.innerHeight || document.documentElement.clientHeight
+        var vw = window.innerWidth || document.documentElement.clientWidth
+        return rect.top < margin ||
+            rect.left < margin ||
+            rect.bottom > vh - margin ||
+            rect.right > vw - margin
+    }
+
+    function scrollIntoViewSmooth(el, block) {
+        if (!el) return
+        el.scrollIntoView({ behavior: 'smooth', block: block || 'center' })
+    }
+
+    // Focus the story input as soon as it becomes editable so the user can
+    // type without clicking. If the field is off-screen, scroll it into view
+    // after focusing (preventScroll keeps the browser from jumping abruptly).
+    function focusStoryInput(input, delayMs) {
+        if (!input) return
+        setTimeout(function() {
+            if (input.disabled) return
+            try {
+                input.focus({ preventScroll: true })
+            } catch (e) {
+                try { input.focus() } catch (e2) {}
+            }
+            if (needsScrollIntoView(input)) {
+                scrollIntoViewSmooth(input, 'center')
+            }
+        }, delayMs || 0)
+    }
+
     function isStoryDone(n) {
         return !!storyFlow.done[n] || !!storyFlow.done[String(n)]
     }
@@ -711,6 +754,71 @@
         }
     }
 
+    function spawnFireworkBurst(host, leftPct, topPct, colors) {
+        var burst = document.createElement('div')
+        burst.className = 'firework-burst'
+        burst.style.left = leftPct + '%'
+        burst.style.top = topPct + '%'
+
+        var flash = document.createElement('span')
+        flash.className = 'firework-flash'
+        flash.style.background = 'radial-gradient(circle, ' + colors[0] + ' 0%, rgba(255,255,255,0.7) 35%, transparent 70%)'
+        burst.appendChild(flash)
+
+        var count = 36
+        var i
+        for (i = 0; i < count; i++) {
+            var angle = (i / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.2
+            var dist = 48 + Math.random() * 52
+            var tx = Math.cos(angle) * dist
+            var ty = Math.sin(angle) * dist
+            var fall = 28 + Math.random() * 48
+            var particle = document.createElement('span')
+            particle.className = 'firework-particle'
+            particle.style.background = colors[i % colors.length]
+            particle.style.color = colors[i % colors.length]
+            particle.style.setProperty('--tx', tx.toFixed(1) + 'px')
+            particle.style.setProperty('--ty', ty.toFixed(1) + 'px')
+            particle.style.setProperty('--fall', fall.toFixed(1) + 'px')
+            particle.style.animationDelay = (Math.random() * 0.06) + 's'
+            burst.appendChild(particle)
+        }
+
+        host.appendChild(burst)
+        setTimeout(function() {
+            if (burst.parentNode) burst.parentNode.removeChild(burst)
+        }, 2400)
+    }
+
+    function burstFireworks(host) {
+        if (!host) return
+        host.innerHTML = ''
+        var palette = [
+            ['#6e8bff', '#9ab4ff', '#ffffff'],
+            ['#4ade80', '#86efac', '#ffffff'],
+            ['#f5b945', '#fcd34d', '#ffffff'],
+            ['#ff7eb3', '#fda4c9', '#ffffff'],
+            ['#38bdf8', '#7dd3fc', '#ffffff'],
+            ['#9a7bff', '#c4b5fd', '#ffffff']
+        ]
+        var bursts = [
+            { left: 16, top: 24 },
+            { left: 82, top: 18 },
+            { left: 48, top: 14 },
+            { left: 28, top: 42 },
+            { left: 72, top: 36 },
+            { left: 54, top: 28 }
+        ]
+        var bi
+        for (bi = 0; bi < bursts.length; bi++) {
+            (function(idx) {
+                setTimeout(function() {
+                    spawnFireworkBurst(host, bursts[idx].left, bursts[idx].top, palette[idx % palette.length])
+                }, idx * 420)
+            })(bi)
+        }
+    }
+
     function goToChecklistTab() {
         switchToTab('steps')
         var section = document.querySelector('.tab-section[data-tab="steps"]')
@@ -722,13 +830,19 @@
         if (!panel) return
         panel.hidden = false
         if (!quiet) burstConfetti($('tutorial-confetti'))
+        // Wait for layout after hidden=false so scroll targets the real position.
+        requestAnimationFrame(function() {
+            requestAnimationFrame(function() {
+                scrollIntoViewSmooth(panel, 'center')
+            })
+        })
     }
 
     function showStepsCelebrate(quiet) {
         var panel = $('steps-celebrate')
         if (!panel) return
         panel.hidden = false
-        if (!quiet) burstConfetti($('steps-confetti'))
+        if (!quiet) burstFireworks($('steps-confetti'))
     }
 
     function allChecklistDone(state) {
@@ -859,6 +973,7 @@
                     input.disabled = false
                     guided.setInputLocked(false)
                     guided.refreshSend()
+                    focusStoryInput(input, 350)
                 }
             }
         }
@@ -870,6 +985,7 @@
                 guided.setTarget(WORKSHOP_GAME.firstPrompt)
                 input.disabled = false
                 guided.refreshSend()
+                focusStoryInput(input)
             }
         }
     }
@@ -880,6 +996,8 @@
         var chat = $('ag-chat')
         var fm = $('ag-fm')
         var treeList = $('ag-tree-list')
+        var emptyHint = $('ag-fm-empty')
+        var openPanel = $('ag-open')
         var fileEl = $('ag-file')
         var tabName = $('ag-tab-name')
         var tabIcon = $('ag-tab') ? $('ag-tab').querySelector('.fe-icon') : null
@@ -891,7 +1009,6 @@
         var agentFiles = []
         var activeIndex = -1
         var sendCount = 0
-        var approvalRound = 0
 
         function updateProgress() {
             if (!progress) return
@@ -908,21 +1025,29 @@
 
         function renderTree() {
             treeList.innerHTML = ''
+            if (emptyHint) emptyHint.hidden = agentFiles.length > 0
             for (var i = 0; i < agentFiles.length; i++) {
                 (function(idx) {
                     var f = agentFiles[idx]
                     var li = document.createElement('li')
-                    li.className = 'fe-node fe-file fe-agent-file'
-                    li.setAttribute('role', 'treeitem')
+                    li.className = 'fe-grid-item fe-agent-file'
+                    li.setAttribute('role', 'listitem')
+                    li.title = f.name
                     if (idx === activeIndex) li.classList.add('is-active')
-                    if (f.isNew) li.classList.add('is-new')
+                    if (f.isNew) {
+                        li.classList.add('is-new')
+                        li.classList.add('is-appearing')
+                    }
+                    var iconWrap = document.createElement('span')
+                    iconWrap.className = 'fe-icon-wrap'
                     var icon = document.createElement('span')
                     icon.className = 'fe-icon ' + (f.icon || 'fe-i-txt')
                     icon.setAttribute('aria-hidden', 'true')
+                    iconWrap.appendChild(icon)
                     var name = document.createElement('span')
-                    name.className = 'fe-name'
-                    name.textContent = f.name
-                    li.appendChild(icon)
+                    name.className = 'fe-label'
+                    name.textContent = fileBasename(f.name)
+                    li.appendChild(iconWrap)
                     li.appendChild(name)
                     li.addEventListener('click', function() {
                         if (busy) return
@@ -936,13 +1061,23 @@
         function selectFile(index, highlightAll) {
             if (index < 0 || index >= agentFiles.length) return
             activeIndex = index
-            for (var i = 0; i < agentFiles.length; i++) agentFiles[i].isNew = false
+            if (!highlightAll) {
+                for (var i = 0; i < agentFiles.length; i++) agentFiles[i].isNew = false
+            }
             var f = agentFiles[index]
             if (tabName) tabName.textContent = f.name
             if (tabIcon) tabIcon.className = 'fe-icon ' + (f.icon || 'fe-i-txt')
             renderTree()
+            if (openPanel) openPanel.hidden = false
             renderLines(fileEl, f.lines, highlightAll ? 'all' : undefined)
             fileEl.scrollTop = 0
+            if (highlightAll) {
+                setTimeout(function() {
+                    if (!agentFiles[index]) return
+                    agentFiles[index].isNew = false
+                    renderTree()
+                }, 1200)
+            }
         }
 
         var guided = attachGuidedTyping(input, sendBtn)
@@ -963,20 +1098,12 @@
                 return
             }
             var next = steps[sendCount]
-            if (next.special === 'approval-gate') {
-                showResult(result, 'ok', '')
-                guided.setTarget(next.prompt)
-                input.disabled = false
-                guided.setInputLocked(false)
-                guided.refreshSend()
-                busy = false
-                return
-            }
             showResult(result, 'ok', '')
             guided.setTarget(next.prompt)
             input.disabled = false
             guided.setInputLocked(false)
             guided.refreshSend()
+            focusStoryInput(input)
             busy = false
         }
 
@@ -991,23 +1118,42 @@
             selectFile(agentFiles.length - 1, true)
         }
 
-        function removeAgentFile(name) {
+        function removeAgentFile(name, done) {
             var removed = -1
             for (var i = 0; i < agentFiles.length; i++) {
                 if (agentFiles[i].name === name) removed = i
             }
-            if (removed < 0) return
-            agentFiles.splice(removed, 1)
-            if (activeIndex >= agentFiles.length) {
-                activeIndex = agentFiles.length - 1
+            if (removed < 0) {
+                if (done) done()
+                return
             }
-            renderTree()
-            if (agentFiles.length > 0) {
-                selectFile(activeIndex < 0 ? 0 : activeIndex, false)
-            } else {
-                renderLines(fileEl, [])
-                if (tabName) tabName.textContent = ''
+
+            var el = treeList.children[removed]
+            function finishRemove() {
+                agentFiles.splice(removed, 1)
+                if (activeIndex >= agentFiles.length) {
+                    activeIndex = agentFiles.length - 1
+                }
+                if (agentFiles.length > 0) {
+                    fm.classList.add('has-file')
+                    selectFile(activeIndex < 0 ? 0 : activeIndex, false)
+                } else {
+                    fm.classList.remove('has-file')
+                    renderTree()
+                    renderLines(fileEl, [])
+                    if (tabName) tabName.textContent = ''
+                    if (openPanel) openPanel.hidden = true
+                }
+                if (done) done()
             }
+
+            if (!el) {
+                finishRemove()
+                return
+            }
+
+            el.classList.add('is-removing')
+            setTimeout(finishRemove, 280)
         }
 
         function runDesignAndPlan(step, done) {
@@ -1024,13 +1170,14 @@
                             pushAgentFile(step.mdFile, step.mdLines, step.mdIcon)
                             typeBubble(chat, 'tool', 'Delete  ' + step.deleteFile, function() {
                                 setTimeout(function() {
-                                    removeAgentFile(step.deleteFile)
-                                    typeBubble(chat, 'tool', 'Create  ' + step.todoFile + '   (new file)', function() {
-                                        setTimeout(function() {
-                                            pushAgentFile(step.todoFile, step.todoLines, step.todoIcon)
-                                            selectFile(agentFiles.length - 1, true)
-                                            typeBubble(chat, 'ai', step.aiDone, done)
-                                        }, 320)
+                                    removeAgentFile(step.deleteFile, function() {
+                                        typeBubble(chat, 'tool', 'Create  ' + step.todoFile + '   (new file)', function() {
+                                            setTimeout(function() {
+                                                pushAgentFile(step.todoFile, step.todoLines, step.todoIcon)
+                                                selectFile(agentFiles.length - 1, true)
+                                                typeBubble(chat, 'ai', step.aiDone, done)
+                                            }, 320)
+                                        })
                                     })
                                 }, 300)
                             })
@@ -1060,21 +1207,9 @@
                 return
             }
 
-            if (step.special === 'approval-gate') {
-                if (approvalRound === 0) {
-                    approvalRound = 1
-                    typeBubble(chat, 'ai', step.aiAsk, function() {
-                        guided.setTarget(step.approvePrompt)
-                        input.disabled = false
-                        guided.setInputLocked(false)
-                        guided.refreshSend()
-                        busy = false
-                    })
-                    return
-                }
-                approvalRound = 0
+            if (step.special === 'want-to-play') {
                 sendCount++
-                typeBubble(chat, 'ai', step.aiOk, function() {
+                typeBubble(chat, 'ai', step.ai, function() {
                     finishAgentStep()
                     busy = false
                 })
@@ -1104,6 +1239,7 @@
                     input.disabled = false
                     guided.setInputLocked(false)
                     guided.refreshSend()
+                    focusStoryInput(input, 350)
                 }
             }
         }
@@ -1112,10 +1248,11 @@
             reset: function() {
                 busy = false
                 sendCount = 0
-                approvalRound = 0
                 agentFiles = []
                 treeList.innerHTML = ''
                 fm.classList.remove('has-file')
+                if (emptyHint) emptyHint.hidden = false
+                if (openPanel) openPanel.hidden = true
                 renderLines(fileEl, [])
                 if (tabName) tabName.textContent = ''
                 if (tabIcon) tabIcon.className = 'fe-icon fe-i-txt'
@@ -1152,7 +1289,7 @@
         outEl.scrollTop = outEl.scrollHeight
     }
 
-    // ----- Step 3: agent runs commands (tests), then approval — all via chat ----
+    // ----- Step 3: user asks to build → tests (write, run) → build --------
     function initCommandDemo() {
         var chat = $('c-chat')
         var result = $('c-result')
@@ -1160,10 +1297,7 @@
         var sendBtn = $('c-send')
         var outEl = $('c-term-out')
         var busy = false
-        var approvePrompt = WORKSHOP_GAME.testApprovePrompt
-        var aiAskTests = 'All tests passed. Approve play-test in the browser?'
-        var aiOkTests = 'Approved.'
-        var testsDone = false
+        var round = 0
 
         function resetTerminal() {
             outEl.textContent = ''
@@ -1172,68 +1306,121 @@
         resetTerminal()
 
         var guided = attachGuidedTyping(input, sendBtn)
-        guided.setTarget(WORKSHOP_GAME.testRunPrompt)
+        guided.setTarget('')
         input.disabled = true
         guided.refreshSend()
 
-        function runTests() {
-            typeBubble(chat, 'ai', WORKSHOP_GAME.testExplain, function() {
-                resetTerminal()
-                playSteps(chat, [
-                    'Run command  cd WebGameTemplateForAgents',
-                    'Run command  open tests/index.html'
-                ], function() {
+        function unlockInput(target) {
+            guided.setTarget(target)
+            input.disabled = false
+            sendBtn.disabled = false
+            guided.setInputLocked(false)
+            guided.refreshSend()
+            focusStoryInput(input)
+        }
+
+        function runTermScript(script, onDone) {
+            script.forEach(function(item) {
+                setTimeout(function() {
+                    if (item.k === 'cmd') appendTermLine(outEl, '$ ' + item.v, 'cmd')
+                    else appendTermLine(outEl, item.v, item.k)
+                }, item.t)
+            })
+            var last = script[script.length - 1]
+            setTimeout(onDone, last.t + 400)
+        }
+
+        function writeTests(done) {
+            playSteps(chat, [
+                'Create  tests/store.test.js   (new file)',
+                'Create  tests/player.test.js   (new file)'
+            ], function() {
+                typeBubble(chat, 'ai', WORKSHOP_GAME.testsWritten, done)
+            })
+        }
+
+        function runTestsOnly(done) {
+            resetTerminal()
+            playSteps(chat, [
+                'Run command  open tests/index.html'
+            ], function() {
                 var script = [
                     { t: 0,   k: 'cmd', v: 'open tests/index.html' },
                     { t: 400, k: 'dim', v: 'Platform Hopper — running test suite…' },
                     { t: 900, k: 'ok',  v: '✓ store — dispatch, replay, tick order' },
                     { t: 1400, k: 'ok', v: '✓ player.js — run / jump on platforms' },
                     { t: 1900, k: 'ok', v: '✓ sparks + exit — matches the plan' },
-                    { t: 2400, k: 'pass', v: '12 passed, 0 failed' },
-                    { t: 2900, k: 'dim', v: 'Next: open the game and try it' }
+                    { t: 2400, k: 'pass', v: '12 passed, 0 failed' }
                 ]
-                script.forEach(function(item) {
-                    setTimeout(function() {
-                        if (item.k === 'cmd') appendTermLine(outEl, '$ ' + item.v, 'cmd')
-                        else appendTermLine(outEl, item.v, item.k)
-                    }, item.t)
+                runTermScript(script, function() {
+                    typeBubble(chat, 'ai', WORKSHOP_GAME.testsPass, done)
                 })
-                setTimeout(function() {
-                    typeBubble(chat, 'ai', 'Tests passed.', function() {
-                        typeBubble(chat, 'ai', aiAskTests, function() {
-                            testsDone = true
-                            guided.setTarget(approvePrompt)
-                            input.disabled = false
-                            guided.setInputLocked(false)
-                            guided.refreshSend()
-                            busy = false
-                        })
-                    })
-                }, 3200)
-                })
+            })
+        }
+
+        function runBuild(done) {
+            playSteps(chat, [
+                'Run command  cd WebGameTemplateForAgents',
+                'Run command  npm run build'
+            ], function() {
+                var script = [
+                    { t: 0,   k: 'cmd', v: 'npm run build' },
+                    { t: 400, k: 'dim', v: 'Platform Hopper — building playable package…' },
+                    { t: 900, k: 'ok',  v: '✓ config linked' },
+                    { t: 1400, k: 'ok', v: '✓ systems bundled' },
+                    { t: 1900, k: 'ok', v: '✓ assets ready' },
+                    { t: 2400, k: 'pass', v: 'Build complete — src/index.html is playable' }
+                ]
+                runTermScript(script, done)
             })
         }
 
         function send() {
             if (busy || !canUseStoryStep(3) || !guided.isComplete()) return
-            var text = guided.getTarget()
             busy = true
             guided.setInputLocked(true)
             input.disabled = true
             sendBtn.disabled = true
-            addBubble(chat, 'user', text)
+            addBubble(chat, 'user', guided.getTarget())
             guided.clearAfterSend()
 
-            if (!testsDone) {
-                runTests()
+            if (round === 0) {
+                round = 1
+                typeBubble(chat, 'ai', WORKSHOP_GAME.buildPitch, function() {
+                    unlockInput(WORKSHOP_GAME.writeTestsPrompt)
+                    busy = false
+                })
                 return
             }
 
-            typeBubble(chat, 'ai', aiOkTests, function() {
-                showResult(result, 'ok', '')
-                completeStoryStep(3)
-                busy = false
-            })
+            if (round === 1) {
+                round = 2
+                writeTests(function() {
+                    unlockInput(WORKSHOP_GAME.runTestsPrompt)
+                    busy = false
+                })
+                return
+            }
+
+            if (round === 2) {
+                round = 3
+                runTestsOnly(function() {
+                    unlockInput(WORKSHOP_GAME.buildAndPlayPrompt)
+                    busy = false
+                })
+                return
+            }
+
+            if (round === 3) {
+                round = 4
+                runBuild(function() {
+                    typeBubble(chat, 'ai', WORKSHOP_GAME.buildDone, function() {
+                        showResult(result, 'ok', '')
+                        completeStoryStep(3)
+                        busy = false
+                    })
+                })
+            }
         }
 
         sendBtn.addEventListener('click', send)
@@ -1243,22 +1430,19 @@
 
         storyStepControls[3] = {
             enable: function() {
-                if (!isStoryDone(3)) {
-                    input.disabled = false
-                    guided.setInputLocked(false)
-                    guided.refreshSend()
-                }
+                if (!isStoryDone(3)) unlockInput(WORKSHOP_GAME.buildRequestPrompt)
             }
         }
 
         storyRestore.command = {
             reset: function() {
                 busy = false
-                testsDone = false
+                round = 0
                 resetTerminal()
                 guided.setInputLocked(false)
-                guided.setTarget(WORKSHOP_GAME.testRunPrompt)
+                guided.setTarget('')
                 input.disabled = true
+                sendBtn.disabled = true
                 guided.refreshSend()
             }
         }
@@ -1322,25 +1506,33 @@
         }
 
         var guided = attachGuidedTyping(input, sendBtn)
-        guided.setTarget(WORKSHOP_GAME.playtestPrompt)
+        guided.setTarget('')
         input.disabled = true
         guided.refreshSend()
 
+        function unlockPlayInput() {
+            guided.setTarget(WORKSHOP_GAME.playtestPrompt)
+            input.disabled = false
+            sendBtn.disabled = false
+            guided.setInputLocked(false)
+            guided.refreshSend()
+            focusStoryInput(input)
+        }
+
         function send() {
             if (busy || !canUseStoryStep(4) || !guided.isComplete()) return
-            var text = guided.getTarget()
             busy = true
             guided.setInputLocked(true)
             input.disabled = true
             sendBtn.disabled = true
             resetGame()
-            addBubble(chat, 'user', text)
+            addBubble(chat, 'user', guided.getTarget())
             guided.clearAfterSend()
 
             playSteps(chat, [
-                'Open browser  file:///…/src/index.html',
+                'Open browser  file:///…/src/index.html — built game',
                 'Play  Platform Hopper — collect factory sparks',
-                'Check  does the game match the plan?'
+                'Check  does the built game match DESIGN.md?'
             ], function() {
                 collectCoin(0, function() {
                     collectCoin(1, function() {
@@ -1365,11 +1557,7 @@
 
         storyStepControls[4] = {
             enable: function() {
-                if (!isStoryDone(4)) {
-                    input.disabled = false
-                    guided.setInputLocked(false)
-                    guided.refreshSend()
-                }
+                if (!isStoryDone(4)) unlockPlayInput()
             }
         }
 
@@ -1378,8 +1566,9 @@
                 busy = false
                 resetGame()
                 guided.setInputLocked(false)
-                guided.setTarget(WORKSHOP_GAME.playtestPrompt)
+                guided.setTarget('')
                 input.disabled = true
+                sendBtn.disabled = true
                 guided.refreshSend()
             }
         }
