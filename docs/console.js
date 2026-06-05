@@ -463,7 +463,7 @@
             },
             {
                 special: 'approval-gate',
-                prompt: 'Is the game really working? Did we get everything right?',
+                prompt: 'Check if the game really working',
                 aiAsk: 'We could write tests and check — that way I\'d know for sure the game works. Approve?',
                 approvePrompt: 'I approve, continue.',
                 aiOk: 'Approved.'
