@@ -1,4 +1,4 @@
-> **Prefer clicking to reading?** Open the [Workshop Console](docs/index.html) — it builds and copies every prompt in this guide for you. When the repo is published on GitHub Pages, it also lives at `https://<user>.github.io/<repo>/`.
+> **Prefer clicking to reading?** Open the [Workshop Console](https://ludenio.github.io/WebGameTemplateForAgents/) — it builds and copies every prompt in this guide for you.
 
 ## 🧭 Workshop Agenda
 
@@ -67,7 +67,7 @@ Now the magic begins. Your job is to generate ideas; the Agent will do the techn
 
 1.  Open the installed agent app.
 2.  Click **Open Folder** and choose the game folder you just downloaded through GitHub Desktop. If you do not see this button, use the application menu instead: **File** → **Open Folder**.
-3.  Open the [Workshop Console](docs/index.html) (tab **1. Create your first game**) **or** the file **`FIRST_PROMPT.md`** in the project folder.
+3.  Open the [Workshop Console](https://ludenio.github.io/WebGameTemplateForAgents/) (tab **1. Create your first game**) **or** the file **`FIRST_PROMPT.md`** in the project folder.
 4.  Describe your game idea: how it looks, what the player does, and who the main character is. You can write in simple language. For example: “Top-down view: the character explores a small island, collects coins, helps villagers find lost items, unlocks new areas, and upgrades tools to move faster.” The console has fields and example concepts; `FIRST_PROMPT.md` has a quality checklist and good/bad concept examples.
 5.  Copy the assembled prompt (from the console’s **Copy prompt** button) or the whole text between the `---` lines in `FIRST_PROMPT.md`, and send it to the Agent in your agent chat.
 
@@ -92,7 +92,7 @@ Use that only when the result looks good enough to continue. If something is wro
 
 * **How to run the game:** No servers are needed. Open the game folder on your computer, go into the `src` folder, and double-click **`index.html`**. The game will open in your browser.
 * **If something looks broken:** refresh the page, make sure you opened `src/index.html` (not a copy in another folder), and paste any error message from the browser back to the Agent so it can fix the project.
-* **How to change the game:** Open the [Workshop Console](docs/index.html) (tab **2. Change a game**) **or** **`NEXT_ITERATION_PROMPT.md`**, describe what you want to change, copy the prompt, and send it to the Agent in a new chat. For example: “Add coins, a small shop, and three upgrades: faster movement, bigger backpack, and a magnet that pulls nearby coins toward the player.”
+* **How to change the game:** Open the [Workshop Console](https://ludenio.github.io/WebGameTemplateForAgents/) (tab **2. Change a game**) **or** **`NEXT_ITERATION_PROMPT.md`**, describe what you want to change, copy the prompt, and send it to the Agent in a new chat. For example: “Add coins, a small shop, and three upgrades: faster movement, bigger backpack, and a magnet that pulls nearby coins toward the player.”
 
 To create a new chat, look for a button named **New Chat**, **New Task**, **New Conversation**, or something similar in your agent app. You can think of it like this: many chats can work with the same project folder. The Agent will update the documents and carefully change the code for you.
 

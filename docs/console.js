@@ -12,8 +12,10 @@
     var checklistItems = [
         { id: 'concept', text: 'Understand how an agent differs from a plain chat' },
         { id: 'account', text: 'Create a GitHub account' },
-        { id: 'tools',   text: 'Install GitHub Desktop and an agent app' },
+        { id: 'desktop', text: 'Install GitHub Desktop' },
+        { id: 'agent-app', text: 'Install an AI agent app (e.g. Cursor)' },
         { id: 'clone',   text: 'Make your own copy of the template and clone it' },
+        { id: 'open-agent', text: 'Open the cloned game folder in your agent app' },
         { id: 'idea',    text: 'Write your game idea' },
         { id: 'send',    text: 'Send the first prompt to the agent' },
         { id: 'design',  text: 'Review and approve the design (DESIGN.md)' },
@@ -261,7 +263,14 @@
     function loadChecklistState() {
         try {
             var raw = localStorage.getItem(STORAGE_KEY)
-            return raw ? JSON.parse(raw) : {}
+            var state = raw ? JSON.parse(raw) : {}
+            if (state.tools) {
+                state.desktop = true
+                state['agent-app'] = true
+                delete state.tools
+                saveChecklistState(state)
+            }
+            return state
         } catch (e) {
             return {}
         }
