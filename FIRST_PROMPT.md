@@ -1,6 +1,10 @@
 # First Prompt
 
-Copy everything between the `---` lines below and paste it into your first message to the AI agent. Replace the placeholder with your game concept.
+Write your idea in normal language. The agent will turn it into a design, a task plan, code, and tests.
+
+**Copy everything between the `---` lines below** and paste it into your first message to the AI agent. Replace the placeholder with your game concept.
+
+> Prefer a form you can click instead of editing this file? Open the **[Workshop Console](docs/index.html)** — tab **1. Create your first game** assembles and copies this exact prompt for you.
 
 ---
 

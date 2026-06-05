@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Workshop Console — Web Game Template</title>
+    <meta name="description" content="Copy prompts and build playable web games with AI agents — no Markdown editing required. A hands-on workshop console: write your first prompt, change a game, and publish it online.">
+    <meta name="author" content="ludenio">
+    <meta name="keywords" content="AI agents, game development, web games, Cursor, workshop, prompts, vibe coding">
+    <meta name="theme-color" content="#060606">
+    <meta name="color-scheme" content="dark">
+    <link rel="canonical" href="https://ludenio.github.io/WebGameTemplateForAgents/">
+
+    <!-- Icons -->
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="favicon-16.png" sizes="16x16" type="image/png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" sizes="180x180">
+    <link rel="manifest" href="site.webmanifest">
+
+    <!-- Open Graph (Facebook, LinkedIn, Slack, Telegram, …) -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Workshop Console">
+    <meta property="og:title" content="Game Development with AI Agents">
+    <meta property="og:description" content="Copy prompts and build playable web games with AI agents — no Markdown editing required.">
+    <meta property="og:url" content="https://ludenio.github.io/WebGameTemplateForAgents/">
+    <meta property="og:image" content="https://ludenio.github.io/WebGameTemplateForAgents/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Workshop Console — Game Development with AI Agents">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Game Development with AI Agents">
+    <meta name="twitter:description" content="Copy prompts and build playable web games with AI agents — no Markdown editing required.">
+    <meta name="twitter:image" content="https://ludenio.github.io/WebGameTemplateForAgents/og-image.png">
+    <meta name="twitter:image:alt" content="Workshop Console — Game Development with AI Agents">
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+
+    <header class="hero">
+        <img class="hero-mascot" src="Nikol.ai.svg" alt="Nikol.ai mascot" width="100" height="84">
+        <span class="badge">Workshop Console</span>
+        <h1>Game Development with AI Agents</h1>
+        <p class="tagline">Copy prompts. No Markdown editing required.</p>
+    </header>
+
+    <!-- Tab buttons -->
+    <nav class="tabs" id="tabs">
+        <button class="tab-btn active" data-tab="intro">0. Agent vs chat</button>
+        <button class="tab-btn" data-tab="first">1. First prompt</button>
+        <button class="tab-btn" data-tab="next">2. Change a game</button>
+        <button class="tab-btn" data-tab="publish">3. Publish online</button>
+        <button class="tab-btn" data-tab="steps">4. Workshop recap</button>
+    </nav>
+
+    <!-- ============ TAB: Agent vs chat (intro) ============ -->
+    <section class="tab-section active panel intro-panel" data-tab="intro">
+        <div class="intro-head">
+            <h2 class="intro-title">Chat vs agent</h2>
+            <button type="button" class="reset-link" id="reset-story">Reset progress</button>
+        </div>
+
+        <!-- Step 1: plain chat — cannot build the game -->
+        <div class="demo-stage" data-story-step="1" id="story-step-1">
+            <div class="demo-stage-head"><span class="demo-step-badge">1</span> Plain chat<button type="button" class="demo-skip chip" data-skip-step="1">Skip</button></div>
+            <div class="demo-stage-body">
+            <div class="demo-grid demo-grid-chat-only">
+                <div class="demo-chat" id="ch-chat"></div>
+            </div>
+            <div class="demo-input-row">
+                <input id="ch-input" type="text" placeholder="Type anything — the message reveals itself" autocomplete="off" spellcheck="false">
+                <button class="btn" id="ch-send">Send</button>
+            </div>
+            <div class="demo-result" id="ch-result"></div>
+            </div>
+            <p class="demo-stage-lock-msg" id="story-lock-1" hidden></p>
+        </div>
+
+        <!-- Step 2: agent creates project files -->
+        <div class="demo-stage demo-stage-locked" data-story-step="2" id="story-step-2">
+            <div class="demo-stage-head"><span class="demo-step-badge alt">2</span> Agent — project files<button type="button" class="demo-skip chip" data-skip-step="2">Skip</button></div>
+            <p class="demo-stage-lock-msg">Finish step 1.</p>
+            <div class="demo-stage-body">
+            <div class="demo-grid">
+                <div class="demo-chat" id="ag-chat"></div>
+                <div class="demo-file file-explorer file-manager" id="ag-fm">
+                    <div class="fe-head">
+                        <span class="fe-head-label">Explorer</span>
+                        <span class="fe-root" title="Project root">WebGameTemplate</span>
+                    </div>
+                    <div class="fe-body">
+                        <div class="fe-tree" role="tree" aria-label="Project files">
+                            <ul class="fe-list" id="ag-tree-list" role="group"></ul>
+                        </div>
+                        <div class="fe-editor" id="ag-open">
+                            <div class="fe-tab" id="ag-tab"><span class="fe-icon fe-i-txt" aria-hidden="true"></span><span id="ag-tab-name"></span></div>
+                            <pre class="demo-file-body" id="ag-file"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="demo-input-row">
+                <input id="ag-input" type="text" placeholder="Type anything — the prompt reveals itself" autocomplete="off" spellcheck="false">
+                <button class="btn" id="ag-send">Send</button>
+            </div>
+            <div class="demo-result" id="ag-result"></div>
+            <p class="demo-stage-progress" id="ag-progress" aria-live="polite"></p>
+            </div>
+        </div>
+
+        <!-- Step 3: agent runs commands on your machine -->
+        <div class="demo-stage demo-stage-locked" data-story-step="3" id="story-step-3">
+            <div class="demo-stage-head"><span class="demo-step-badge alt2">3</span> Agent — run commands<button type="button" class="demo-skip chip" data-skip-step="3">Skip</button></div>
+            <p class="demo-stage-lock-msg">Finish step 2.</p>
+            <div class="demo-stage-body">
+            <div class="demo-grid">
+                <div class="demo-chat" id="c-chat"></div>
+                <div class="fake-terminal show" id="c-terminal">
+                    <div class="ft-head">
+                        <span class="ft-dots"><i></i><i></i><i></i></span>
+                        <span class="ft-title">Terminal — zsh</span>
+                    </div>
+                    <pre class="ft-body" id="c-term-out" aria-live="polite"></pre>
+                </div>
+            </div>
+            <div class="demo-input-row">
+                <input id="c-input" type="text" placeholder="Type anything — the message reveals itself" autocomplete="off" spellcheck="false">
+                <button class="btn" id="c-send">Send</button>
+            </div>
+            <div class="demo-result" id="c-result"></div>
+            </div>
+        </div>
+
+        <!-- Step 4: agent plays the game and checks expectations -->
+        <div class="demo-stage demo-stage-locked" data-story-step="4" id="story-step-4">
+            <div class="demo-stage-head"><span class="demo-step-badge alt3">4</span> Agent — play-test<button type="button" class="demo-skip chip" data-skip-step="4">Skip</button></div>
+            <p class="demo-stage-lock-msg">Finish step 3.</p>
+            <div class="demo-stage-body">
+            <div class="demo-grid">
+                <div class="demo-chat" id="p-chat"></div>
+                <div class="fake-browser show game-preview" id="p-browser">
+                    <div class="fb-bar">
+                        <span class="fb-dots"><i></i><i></i><i></i></span>
+                        <span class="fb-address">file:///…/src/index.html — Platform Hopper</span>
+                        <span class="fb-reload">&#10227;</span>
+                    </div>
+                    <div class="fb-body gp-body">
+                        <div class="gp-title">Platform Hopper</div>
+                        <div class="gp-hud">Sparks <strong id="p-score">0</strong> / <span id="p-target">3</span></div>
+                        <div class="gp-stage" id="p-stage">
+                            <div class="gp-player" id="p-player" aria-hidden="true"></div>
+                            <div class="gp-coin" id="p-coin-0" aria-hidden="true"></div>
+                            <div class="gp-coin" id="p-coin-1" aria-hidden="true"></div>
+                            <div class="gp-coin" id="p-coin-2" aria-hidden="true"></div>
+                        </div>
+                        <div class="gp-compare">
+                            <div class="gp-row">
+                                <span class="gp-label">Expected</span>
+                                <span class="gp-value" id="p-expected">DESIGN.md: collect 3 sparks, reach the exit platform</span>
+                            </div>
+                            <div class="gp-row" id="p-actual-row">
+                                <span class="gp-label">Actual</span>
+                                <span class="gp-value" id="p-actual">Sparks = 0, exit not reached</span>
+                                <span class="gp-match" id="p-match" hidden>&#10003; matches</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="demo-input-row">
+                <input id="p-input" type="text" placeholder="Type anything — the message reveals itself" autocomplete="off" spellcheck="false">
+                <button class="btn" id="p-send">Send</button>
+            </div>
+            <div class="demo-result" id="p-result"></div>
+            </div>
+        </div>
+
+        <div class="tutorial-celebrate" id="tutorial-celebrate" hidden>
+            <div class="tutorial-celebrate-confetti" id="tutorial-confetti" aria-hidden="true"></div>
+            <div class="tutorial-celebrate-card">
+                <div class="tutorial-celebrate-icon" aria-hidden="true"><img src="Nikol.ai.svg" alt=""><span class="tutorial-celebrate-check">&#10003;</span></div>
+                <h3 class="tutorial-celebrate-title">Chat vs agent</h3>
+                <p class="tutorial-celebrate-text">You now know how <strong>chats</strong> differ from <strong>agents</strong>. Let&rsquo;s use an agent to build our game.</p>
+                <button type="button" class="btn" id="tutorial-continue-btn">First prompt</button>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- ============ TAB: First game ============ -->
+    <section class="tab-section panel" data-tab="first">
+        <h2>First prompt</h2>
+        <p class="hint">Fill in as much as you like, or just write a free description. The preview builds a complete prompt you can paste into your AI agent.</p>
+
+        <div class="field">
+            <label>Quick start ideas (click to fill the description)</label>
+            <div class="chips" id="example-chips"></div>
+        </div>
+
+        <div class="grid-2">
+            <div class="field">
+                <label for="f-genre">Genre</label>
+                <input id="f-genre" type="text" placeholder="e.g. top-down arcade">
+            </div>
+            <div class="field">
+                <label for="f-action">Core action — what the player does</label>
+                <input id="f-action" type="text" placeholder="e.g. move around and collect coins">
+            </div>
+            <div class="field">
+                <label for="f-goal">Goal</label>
+                <input id="f-goal" type="text" placeholder="e.g. reach 20 points">
+            </div>
+            <div class="field">
+                <label for="f-style">Visual style</label>
+                <input id="f-style" type="text" placeholder="e.g. bright, simple shapes">
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="f-winlose">Win / lose conditions</label>
+            <input id="f-winlose" type="text" placeholder="e.g. win at 20 coins, lose if the timer runs out">
+        </div>
+
+        <div class="field">
+            <label for="f-idea">Your own description (optional, but recommended)</label>
+            <textarea id="f-idea" placeholder="Describe your game in normal language. The more detail, the better the design."></textarea>
+        </div>
+
+        <div class="preview-head">
+            <h3>Prompt preview (updates as you type)</h3>
+            <button class="btn" id="copy-first">Copy prompt</button>
+        </div>
+        <pre class="preview" id="preview-first"></pre>
+
+        <div class="note">After you paste this, the agent will ask you to approve its plan. When you are happy, reply with an approval phrase from tab <strong>4. Workshop recap</strong>.</div>
+    </section>
+
+    <!-- ============ TAB: Next iteration ============ -->
+    <section class="tab-section panel" data-tab="next">
+        <h2>Change an existing game</h2>
+        <p class="hint">Use this after your first game already works. Describe one change — a new feature, a balance tweak, or something to remove.</p>
+
+        <div class="field">
+            <label for="n-change">What do you want to change?</label>
+            <textarea id="n-change" placeholder="e.g. Add a shop where I can spend coins on a speed upgrade."></textarea>
+        </div>
+
+        <div class="preview-head">
+            <h3>Prompt preview</h3>
+            <button class="btn" id="copy-next">Copy prompt</button>
+        </div>
+        <pre class="preview" id="preview-next"></pre>
+    </section>
+
+    <!-- ============ TAB: Publish ============ -->
+    <section class="tab-section panel" data-tab="publish">
+        <h2>Publish your game online</h2>
+        <p class="hint">Ask the agent to put your game on the web with Surge, so you can share a playable link. Fill in your details below.</p>
+
+        <div class="grid-2">
+            <div class="field">
+                <label for="p-email">Your email (for Surge)</label>
+                <input id="p-email" type="text" placeholder="you@example.com">
+            </div>
+            <div class="field">
+                <label for="p-name">Site address</label>
+                <div class="domain-row">
+                    <div class="domain-input">
+                        <input id="p-name" type="text" placeholder="my-game-name" autocomplete="off" spellcheck="false">
+                        <span class="domain-suffix" aria-hidden="true">.surge.sh</span>
+                    </div>
+                    <button class="btn secondary" id="check-name" type="button">Check</button>
+                </div>
+                <div class="domain-status" id="p-name-status" role="status" aria-live="polite"></div>
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="p-pass">Surge password (optional)</label>
+            <input id="p-pass" type="text" placeholder="a throwaway password, used only to log in to Surge">
+        </div>
+
+        <div class="preview-head">
+            <h3>Prompt preview</h3>
+            <button class="btn" id="copy-publish">Copy prompt</button>
+        </div>
+        <pre class="preview" id="preview-publish"></pre>
+
+        <div class="note">The <code>.surge.sh</code> ending is fixed — you only choose the name in front of it. As you type, the address is checked live so you can see whether it is free or already taken before you publish. If you fill in a password it is added to the prompt so the agent can log in without stopping, so use a <strong>throwaway password</strong> you do not reuse elsewhere. Leave it blank and the agent will instead pause and let you type the password yourself. Either way, never let the password get saved into project files.</div>
+    </section>
+
+    <!-- ============ TAB: Workshop recap (checklist) ============ -->
+    <section class="tab-section panel" data-tab="steps">
+        <h2>Workshop recap</h2>
+        <p class="hint">Check off what you&rsquo;ve done. Progress is saved in this browser. Come back here at the end of the workshop.</p>
+
+        <div class="progress"><span id="progress-bar"></span></div>
+        <ul class="checklist" id="checklist"></ul>
+        <button class="reset-link" id="reset-checklist">Reset checklist</button>
+
+        <div class="preview-head">
+            <h3>Quick approval phrases</h3>
+        </div>
+        <div class="btn-row">
+            <button class="btn secondary" id="copy-approve-continue">Copy: I approve, continue.</button>
+            <button class="btn secondary" id="copy-approve-run">Copy: I approve, run it.</button>
+        </div>
+
+        <div class="preview-head">
+            <h3>Open your project</h3>
+        </div>
+        <div class="quick-grid">
+            <a class="quick-card" href="../src/index.html">
+                <div class="qc-title">Open the game</div>
+                <div class="qc-sub">src/index.html</div>
+            </a>
+            <a class="quick-card" href="../tests/index.html">
+                <div class="qc-title">Run the tests</div>
+                <div class="qc-sub">tests/index.html</div>
+            </a>
+        </div>
+
+        <div class="tutorial-celebrate" id="steps-celebrate" hidden>
+            <div class="tutorial-celebrate-confetti" id="steps-confetti" aria-hidden="true"></div>
+            <div class="tutorial-celebrate-card">
+                <div class="tutorial-celebrate-icon" aria-hidden="true"><img src="Nikol.ai.svg" alt=""><span class="tutorial-celebrate-check">&#10003;</span></div>
+                <h3 class="tutorial-celebrate-title">Workshop complete</h3>
+                <p class="tutorial-celebrate-text tutorial-celebrate-text--success">Congratulations &mdash; you finished the workshop. You now know how to create things with agents. Go build whatever you want.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="site">
+        <img class="footer-mascot" src="Nikol.ai.svg" alt="" aria-hidden="true" width="100" height="84">
+        <a href="https://github.com/ludenio/WebGameTemplateForAgents/blob/main/AGENTS_WORKSHOP_GUIDE.md">Workshop guide (AGENTS_WORKSHOP_GUIDE.md)</a>
+    </footer>
+
+</div>
+
+<!-- Scripts in dependency order. No ES modules, no build step. -->
+<script src="prompts.js"></script>
+<script src="console.js"></script>
+</body>
+</html>

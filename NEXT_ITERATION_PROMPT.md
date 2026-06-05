@@ -2,7 +2,9 @@
 
 Use this template when you want to change, add, or remove something in a game that has already been through the first development cycle (i.e. `DESIGN.md`, `TODO.md`, and working code already exist).
 
-Copy everything between the `---` lines below and paste it into your message to the coding agent. Replace the placeholder with your change request.
+**Copy everything between the `---` lines below** and paste it into your message to the coding agent. Replace the placeholder with your change request.
+
+> Prefer a form you can click instead of editing this file? Open the **[Workshop Console](docs/index.html)** — tab **2. Change a game** assembles and copies this exact prompt for you.
 
 ---
 
