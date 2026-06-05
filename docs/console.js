@@ -536,6 +536,13 @@
 
         function syncValue() {
             input.value = target.slice(0, pos)
+            // Programmatic value changes don't auto-scroll the field, so on
+            // narrow screens (mobile, portrait) the latest characters slide
+            // out of view. Pin the caret to the end and force the horizontal
+            // scroll so the last typed character is always visible.
+            var end = input.value.length
+            try { input.setSelectionRange(end, end) } catch (e) {}
+            input.scrollLeft = input.scrollWidth
         }
 
         function refreshSend() {
