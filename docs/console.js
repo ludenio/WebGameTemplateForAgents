@@ -722,7 +722,6 @@
         if (!panel) return
         panel.hidden = false
         if (!quiet) burstConfetti($('tutorial-confetti'))
-        markChecklistDone('concept')
     }
 
     function showStepsCelebrate(quiet) {
@@ -790,8 +789,6 @@
         if (storyRestore.agent) storyRestore.agent.reset()
         if (storyRestore.command) storyRestore.command.reset()
         if (storyRestore.playtest) storyRestore.playtest.reset()
-
-        uncheckChecklistItem('concept')
 
         var step1 = storyStage(1)
         if (step1) step1.scrollIntoView({ behavior: 'smooth', block: 'start' })
