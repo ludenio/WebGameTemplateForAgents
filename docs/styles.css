@@ -82,11 +82,22 @@ header.hero .badge::before {
     box-shadow: 0 0 10px var(--green);
 }
 
+header.hero .hero-mascot-link {
+    display: block;
+    width: fit-content;
+    margin: 0 auto 20px;
+    cursor: pointer;
+    transition: transform 0.25s ease;
+}
+
+header.hero .hero-mascot-link:hover {
+    transform: translateY(-3px) rotate(3deg);
+}
+
 header.hero .hero-mascot {
     display: block;
     width: clamp(76px, 12vw, 108px);
     height: auto;
-    margin: 0 auto 20px;
     filter: drop-shadow(0 14px 30px rgba(137, 178, 68, 0.34));
     animation: mascot-float 4.5s ease-in-out infinite;
 }
@@ -96,6 +107,7 @@ header.hero .hero-mascot {
 }
 @media (prefers-reduced-motion: reduce) {
     header.hero .hero-mascot { animation: none; }
+    header.hero .hero-mascot-link:hover { transform: none; }
 }
 
 header.hero h1 {
@@ -116,6 +128,17 @@ header.hero p.tagline {
     max-width: 620px;
     margin: 0 auto;
     font-weight: 400;
+}
+
+.hero-guide {
+    margin-top: 28px;
+}
+
+.hero-guide-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
 }
 
 /* Tabs ----------------------------------------------------------------- */
@@ -1478,30 +1501,92 @@ footer.site {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 20px;
+    padding: 48px 0 36px;
     text-align: center;
+}
+
+.footer-logos {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 28px;
+}
+
+.footer-note {
+    margin: 0;
+    max-width: 38em;
     color: var(--faint);
     font-size: 13px;
-    padding: 48px 0 0;
+    line-height: 1.6;
 }
+
+.footer-note a {
+    color: var(--text-2);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.footer-note a:hover {
+    color: var(--text);
+}
+
+footer.site .footer-mascot-link {
+    display: inline-flex;
+    cursor: pointer;
+    transition: transform 0.25s ease;
+}
+
+footer.site .footer-mascot-link:hover {
+    transform: translateY(-3px) rotate(3deg);
+}
+
 footer.site .footer-mascot {
     width: 46px;
     height: auto;
     opacity: 0.9;
     filter: drop-shadow(0 8px 18px rgba(137, 178, 68, 0.28));
-    transition: transform 0.25s ease;
 }
-footer.site .footer-mascot:hover { transform: translateY(-3px) rotate(3deg); }
-footer.site a { color: var(--text-2); }
-footer.site .github-link {
+
+footer.site .footer-luden-link {
+    display: inline-flex;
+    opacity: 0.82;
+    transition: opacity 0.2s ease, transform 0.25s ease;
+}
+
+footer.site .footer-luden-link:hover {
+    opacity: 1;
+    transform: translateY(-2px);
+}
+
+footer.site .footer-luden-logo {
+    display: block;
+    height: 32px;
+    width: auto;
+}
+
+footer.site .footer-github-link {
     display: inline-flex;
     opacity: 0.72;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.2s ease, transform 0.25s ease;
 }
-footer.site .github-link:hover { opacity: 1; }
-footer.site .footer-github {
+
+footer.site .footer-github-link:hover {
+    opacity: 1;
+    transform: translateY(-2px);
+}
+
+footer.site .footer-github-logo {
     display: block;
     height: 28px;
     width: auto;
 }
+
+@media (prefers-reduced-motion: reduce) {
+    footer.site .footer-mascot-link:hover,
+    footer.site .footer-luden-link:hover,
+    footer.site .footer-github-link:hover { transform: none; }
+}
+
 footer.site code { font-size: 0.85em; }

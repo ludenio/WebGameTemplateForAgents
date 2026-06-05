@@ -1,6 +1,6 @@
 // docs/console.js
 // Workshop Console logic: tab switching, live prompt assembly, copy buttons,
-// example chips, and a localStorage-backed workshop checklist.
+// example chips, and localStorage-backed story + checklist progress.
 //
 // Loaded via a plain <script> tag after prompts.js. No ES modules, no build,
 // no external dependencies, no Math.random(). Works via file:/// and Pages.
@@ -8,6 +8,7 @@
     'use strict'
 
     var STORAGE_KEY = 'workshopConsole.checklist.v1'
+    var STORY_STORAGE_KEY = 'workshopConsole.story.v1'
 
     var checklistItems = [
         { id: 'concept', text: 'Understand how an agent differs from a plain chat' },
@@ -376,9 +377,59 @@
     //   3. User asks to build → agent writes tests → runs tests → builds
     //   4. Built game is shown; user asks to play → agent play-tests it
 
-    var storyFlow = { unlockedMax: 1, done: {} }
+    var storyFlow = { unlockedMax: 1, done: {}, demos: {} }
     var storyStepControls = {}
     var storyRestore = { agent: null, command: null, playtest: null }
+
+    function normalizeStoryFlow(raw) {
+        if (!raw || typeof raw !== 'object') {
+            return { unlockedMax: 1, done: {}, demos: {} }
+        }
+        var done = raw.done && typeof raw.done === 'object' ? raw.done : {}
+        var cleanDone = {}
+        var maxDone = 0
+        var n
+        for (n = 1; n <= 4; n++) {
+            if (done[n] || done[String(n)]) {
+                cleanDone[n] = true
+                maxDone = n
+            }
+        }
+        var unlockedMax = parseInt(raw.unlockedMax, 10)
+        if (isNaN(unlockedMax)) unlockedMax = 1
+        unlockedMax = Math.max(1, Math.min(4, unlockedMax))
+        if (maxDone < 4) unlockedMax = Math.max(unlockedMax, maxDone + 1)
+        else unlockedMax = 4
+
+        var demos = {}
+        if (raw.demos && typeof raw.demos === 'object') {
+            if (raw.demos.agent) {
+                var sc = parseInt(raw.demos.agent.sendCount, 10)
+                if (!isNaN(sc) && sc > 0) demos.agent = { sendCount: sc }
+            }
+            if (raw.demos.command) {
+                var rd = parseInt(raw.demos.command.round, 10)
+                if (!isNaN(rd) && rd > 0) demos.command = { round: rd }
+            }
+        }
+
+        return { unlockedMax: unlockedMax, done: cleanDone, demos: demos }
+    }
+
+    function loadStoryState() {
+        try {
+            var raw = localStorage.getItem(STORY_STORAGE_KEY)
+            return normalizeStoryFlow(raw ? JSON.parse(raw) : null)
+        } catch (e) {
+            return { unlockedMax: 1, done: {}, demos: {} }
+        }
+    }
+
+    function saveStoryState() {
+        try {
+            localStorage.setItem(STORY_STORAGE_KEY, JSON.stringify(storyFlow))
+        } catch (e) {}
+    }
 
     var WORKSHOP_GAME = {
         name: 'Platform Hopper',
@@ -474,6 +525,148 @@
         ]
     }
     WORKSHOP_GAME.agentSteps[0].lines = WORKSHOP_GAME.ideaLines
+
+    function reconcileStoryDemos() {
+        var demos = storyFlow.demos || {}
+        if (demos.agent && demos.agent.sendCount > 0) {
+            storyFlow.done[1] = true
+            storyFlow.unlockedMax = Math.max(storyFlow.unlockedMax, 2)
+            if (demos.agent.sendCount >= WORKSHOP_GAME.agentSteps.length) {
+                storyFlow.done[2] = true
+                storyFlow.unlockedMax = Math.max(storyFlow.unlockedMax, 3)
+            }
+        }
+        if (demos.command && demos.command.round > 0) {
+            storyFlow.done[1] = true
+            storyFlow.done[2] = true
+            storyFlow.unlockedMax = Math.max(storyFlow.unlockedMax, 3)
+            if (demos.command.round >= 4) {
+                storyFlow.done[3] = true
+                storyFlow.unlockedMax = Math.max(storyFlow.unlockedMax, 4)
+            }
+        }
+    }
+
+    var COMMAND_TEST_SCRIPT = [
+        { k: 'cmd', v: 'open tests/index.html' },
+        { k: 'dim', v: 'Platform Hopper — running test suite…' },
+        { k: 'ok',  v: '✓ store — dispatch, replay, tick order' },
+        { k: 'ok',  v: '✓ player.js — run / jump on platforms' },
+        { k: 'ok',  v: '✓ sparks + exit — matches the plan' },
+        { k: 'pass', v: '12 passed, 0 failed' }
+    ]
+
+    var COMMAND_BUILD_SCRIPT = [
+        { k: 'cmd', v: 'npm run build' },
+        { k: 'dim', v: 'Platform Hopper — building playable package…' },
+        { k: 'ok',  v: '✓ config linked' },
+        { k: 'ok',  v: '✓ systems bundled' },
+        { k: 'ok',  v: '✓ assets ready' },
+        { k: 'pass', v: 'Build complete — src/index.html is playable' }
+    ]
+
+    function buildAgentChatMessages(steps, sendCount) {
+        var messages = []
+        var i
+        for (i = 0; i < sendCount; i++) {
+            var step = steps[i]
+            messages.push({ who: 'user', text: step.prompt })
+            if (step.special === 'design-and-plan') {
+                messages.push({ who: 'tool', text: 'Read  game-idea.txt' })
+                messages.push({ who: 'ai', text: step.aiExplain })
+                messages.push({ who: 'tool', text: 'Create  ' + step.mdFile + '   (new file)' })
+                messages.push({ who: 'tool', text: 'Delete  ' + step.deleteFile })
+                messages.push({ who: 'tool', text: 'Create  ' + step.todoFile + '   (new file)' })
+                messages.push({ who: 'ai', text: step.aiDone })
+            } else if (step.special === 'want-to-play') {
+                messages.push({ who: 'ai', text: step.ai })
+            } else {
+                messages.push({ who: 'tool', text: step.tool + '   (new file)' })
+                messages.push({ who: 'ai', text: step.ai })
+            }
+        }
+        return messages
+    }
+
+    function buildAgentFilesAtSendCount(steps, sendCount) {
+        var files = []
+        var i
+        for (i = 0; i < sendCount; i++) {
+            var step = steps[i]
+            if (step.special === 'design-and-plan') {
+                var kept = []
+                var f
+                for (f = 0; f < files.length; f++) {
+                    if (files[f].name !== step.deleteFile) kept.push(files[f])
+                }
+                files = kept
+                files.push({
+                    name: step.mdFile,
+                    lines: step.mdLines.slice(),
+                    icon: step.mdIcon,
+                    isNew: false
+                })
+                files.push({
+                    name: step.todoFile,
+                    lines: step.todoLines.slice(),
+                    icon: step.todoIcon,
+                    isNew: false
+                })
+            } else if (step.file) {
+                files.push({
+                    name: step.file,
+                    lines: (step.lines || []).slice(),
+                    icon: step.icon,
+                    isNew: false
+                })
+            }
+        }
+        return files
+    }
+
+    function buildCommandChatMessages(round) {
+        var g = WORKSHOP_GAME
+        var messages = []
+        if (round >= 1) {
+            messages.push({ who: 'user', text: g.buildRequestPrompt })
+            messages.push({ who: 'ai', text: g.buildPitch })
+        }
+        if (round >= 2) {
+            messages.push({ who: 'user', text: g.writeTestsPrompt })
+            messages.push({ who: 'tool', text: 'Create  tests/store.test.js   (new file)' })
+            messages.push({ who: 'tool', text: 'Create  tests/player.test.js   (new file)' })
+            messages.push({ who: 'ai', text: g.testsWritten })
+        }
+        if (round >= 3) {
+            messages.push({ who: 'user', text: g.runTestsPrompt })
+            messages.push({ who: 'tool', text: 'Run command  open tests/index.html' })
+            messages.push({ who: 'ai', text: g.testsPass })
+        }
+        if (round >= 4) {
+            messages.push({ who: 'user', text: g.buildAndPlayPrompt })
+            messages.push({ who: 'tool', text: 'Run command  cd WebGameTemplateForAgents' })
+            messages.push({ who: 'tool', text: 'Run command  npm run build' })
+            messages.push({ who: 'ai', text: g.buildDone })
+        }
+        return messages
+    }
+
+    function appendTermLine(outEl, text, kind) {
+        var line = document.createElement('span')
+        line.className = 'ft-line' + (kind ? ' ' + kind : '')
+        line.textContent = text
+        outEl.appendChild(line)
+        outEl.appendChild(document.createTextNode('\n'))
+        outEl.scrollTop = outEl.scrollHeight
+    }
+
+    function renderTermScript(outEl, script) {
+        for (var i = 0; i < script.length; i++) {
+            var item = script[i]
+            if (item.k === 'cmd') appendTermLine(outEl, '$ ' + item.v, 'cmd')
+            else appendTermLine(outEl, item.v, item.k)
+        }
+    }
 
     function fileBasename(path) {
         var i = path.lastIndexOf('/')
@@ -703,17 +896,27 @@
                 }, 320)
             }
         }
+        if (!storyFlow.demos) storyFlow.demos = {}
+        if (n === 2) {
+            storyFlow.demos.agent = { sendCount: WORKSHOP_GAME.agentSteps.length }
+        }
+        if (n === 3) {
+            storyFlow.demos.command = { round: 4 }
+        }
         if (n === 4) {
             showTutorialComplete(false)
+            markChecklistDone('concept')
         } else {
             unlockStoryStep(n + 1)
         }
+        saveStoryState()
     }
 
-    function unlockStoryStep(n) {
+    function unlockStoryStep(n, shouldFocus) {
         if (n < 1 || n > 4) return
+        if (shouldFocus === undefined) shouldFocus = true
         var ctrl = storyStepControls[n]
-        if (ctrl && ctrl.enable) ctrl.enable()
+        if (ctrl && ctrl.enable) ctrl.enable(shouldFocus)
     }
 
     function skipStoryStep(n) {
@@ -873,8 +1076,8 @@
     }
 
     function resetStoryTutorial() {
-        storyFlow.unlockedMax = 1
-        storyFlow.done = {}
+        storyFlow = { unlockedMax: 1, done: {}, demos: {} }
+        saveStoryState()
 
         var celebrate = $('tutorial-celebrate')
         if (celebrate) celebrate.hidden = true
@@ -906,6 +1109,27 @@
 
         var step1 = storyStage(1)
         if (step1) step1.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        uncheckChecklistItem('concept')
+        unlockStoryStep(1, false)
+    }
+
+    function restoreStoryUI() {
+        applyStoryLocks()
+        if (isStoryDone(4)) return
+        var n
+        for (n = 1; n <= 4; n++) {
+            if (storyFlow.unlockedMax >= n && !isStoryDone(n)) {
+                unlockStoryStep(n, false)
+                return
+            }
+        }
+        unlockStoryStep(1, false)
+    }
+
+    function syncStoryChecklist() {
+        if (!isStoryDone(4)) return
+        markChecklistDone('concept')
+        showTutorialComplete(true)
     }
 
     function initTutorialCelebrate() {
@@ -968,12 +1192,12 @@
         })
 
         storyStepControls[1] = {
-            enable: function() {
+            enable: function(shouldFocus) {
                 if (!isStoryDone(1)) {
                     input.disabled = false
                     guided.setInputLocked(false)
                     guided.refreshSend()
-                    focusStoryInput(input, 350)
+                    if (shouldFocus !== false) focusStoryInput(input, 350)
                 }
             }
         }
@@ -987,6 +1211,15 @@
                 guided.refreshSend()
                 focusStoryInput(input)
             }
+        }
+
+        if (isStoryDone(1)) {
+            chat.innerHTML = ''
+            addBubble(chat, 'user', WORKSHOP_GAME.firstPrompt)
+            addBubble(chat, 'ai', WORKSHOP_GAME.chatReply)
+            showResult(result, 'warn', '')
+            input.disabled = true
+            sendBtn.disabled = true
         }
     }
 
@@ -1083,6 +1316,12 @@
         var guided = attachGuidedTyping(input, sendBtn)
         guided.setTarget(steps[0].prompt)
 
+        function persistAgentProgress() {
+            if (!storyFlow.demos) storyFlow.demos = {}
+            storyFlow.demos.agent = { sendCount: sendCount }
+            saveStoryState()
+        }
+
         function finishAgentStep() {
             input.disabled = true
             sendBtn.disabled = true
@@ -1090,7 +1329,55 @@
             completeStoryStep(2)
         }
 
+        function restoreAgentProgress(count) {
+            count = Math.max(0, Math.min(steps.length, count))
+            sendCount = count
+            chat.innerHTML = ''
+            var messages = buildAgentChatMessages(steps, count)
+            var m
+            for (m = 0; m < messages.length; m++) {
+                addBubble(chat, messages[m].who, messages[m].text)
+            }
+            agentFiles = buildAgentFilesAtSendCount(steps, count)
+            activeIndex = agentFiles.length > 0 ? agentFiles.length - 1 : -1
+            if (agentFiles.length > 0) {
+                fm.classList.add('has-file')
+                if (emptyHint) emptyHint.hidden = true
+                var f = agentFiles[activeIndex]
+                if (tabName) tabName.textContent = f.name
+                if (tabIcon) tabIcon.className = 'fe-icon ' + (f.icon || 'fe-i-txt')
+                if (openPanel) openPanel.hidden = false
+                renderTree()
+                renderLines(fileEl, f.lines)
+            } else {
+                fm.classList.remove('has-file')
+                treeList.innerHTML = ''
+                if (emptyHint) emptyHint.hidden = false
+                if (openPanel) openPanel.hidden = true
+                renderLines(fileEl, [])
+                if (tabName) tabName.textContent = ''
+                if (tabIcon) tabIcon.className = 'fe-icon fe-i-txt'
+            }
+            updateProgress()
+            if (isStoryDone(2) || count >= steps.length) {
+                input.disabled = true
+                sendBtn.disabled = true
+                showResult(result, 'ok', '')
+                return
+            }
+            if (canUseStoryStep(2)) {
+                guided.setTarget(steps[count].prompt)
+                input.disabled = false
+                guided.setInputLocked(false)
+                guided.refreshSend()
+            } else {
+                input.disabled = true
+                sendBtn.disabled = true
+            }
+        }
+
         function afterAgentRound() {
+            persistAgentProgress()
             updateProgress()
             if (sendCount >= steps.length) {
                 finishAgentStep()
@@ -1209,6 +1496,7 @@
 
             if (step.special === 'want-to-play') {
                 sendCount++
+                persistAgentProgress()
                 typeBubble(chat, 'ai', step.ai, function() {
                     finishAgentStep()
                     busy = false
@@ -1234,12 +1522,12 @@
         })
 
         storyStepControls[2] = {
-            enable: function() {
+            enable: function(shouldFocus) {
                 if (!isStoryDone(2)) {
                     input.disabled = false
                     guided.setInputLocked(false)
                     guided.refreshSend()
-                    focusStoryInput(input, 350)
+                    if (shouldFocus !== false) focusStoryInput(input, 350)
                 }
             }
         }
@@ -1263,6 +1551,11 @@
                 updateProgress()
             }
         }
+
+        var savedAgentCount = 0
+        if (isStoryDone(2)) savedAgentCount = steps.length
+        else if (storyFlow.demos && storyFlow.demos.agent) savedAgentCount = storyFlow.demos.agent.sendCount || 0
+        if (savedAgentCount > 0) restoreAgentProgress(savedAgentCount)
     }
 
     function playSteps(logEl, steps, finish) {
@@ -1278,15 +1571,6 @@
             })
         }
         next()
-    }
-
-    function appendTermLine(outEl, text, kind) {
-        var line = document.createElement('span')
-        line.className = 'ft-line' + (kind ? ' ' + kind : '')
-        line.textContent = text
-        outEl.appendChild(line)
-        outEl.appendChild(document.createTextNode('\n'))
-        outEl.scrollTop = outEl.scrollHeight
     }
 
     // ----- Step 3: user asks to build → tests (write, run) → build --------
@@ -1310,13 +1594,51 @@
         input.disabled = true
         guided.refreshSend()
 
-        function unlockInput(target) {
+        var commandPrompts = [
+            WORKSHOP_GAME.buildRequestPrompt,
+            WORKSHOP_GAME.writeTestsPrompt,
+            WORKSHOP_GAME.runTestsPrompt,
+            WORKSHOP_GAME.buildAndPlayPrompt
+        ]
+
+        function unlockInput(target, shouldFocus) {
             guided.setTarget(target)
             input.disabled = false
             sendBtn.disabled = false
             guided.setInputLocked(false)
             guided.refreshSend()
-            focusStoryInput(input)
+            if (shouldFocus !== false) focusStoryInput(input)
+        }
+
+        function persistCommandProgress() {
+            if (!storyFlow.demos) storyFlow.demos = {}
+            storyFlow.demos.command = { round: round }
+            saveStoryState()
+        }
+
+        function restoreCommandProgress(savedRound) {
+            round = Math.max(0, Math.min(4, savedRound))
+            chat.innerHTML = ''
+            var messages = buildCommandChatMessages(round)
+            var m
+            for (m = 0; m < messages.length; m++) {
+                addBubble(chat, messages[m].who, messages[m].text)
+            }
+            resetTerminal()
+            if (round >= 3) renderTermScript(outEl, COMMAND_TEST_SCRIPT)
+            if (round >= 4) renderTermScript(outEl, COMMAND_BUILD_SCRIPT)
+            if (isStoryDone(3) || round >= 4) {
+                showResult(result, 'ok', '')
+                input.disabled = true
+                sendBtn.disabled = true
+                return
+            }
+            if (canUseStoryStep(3) && round < commandPrompts.length) {
+                unlockInput(commandPrompts[round], false)
+            } else {
+                input.disabled = true
+                sendBtn.disabled = true
+            }
         }
 
         function runTermScript(script, onDone) {
@@ -1386,6 +1708,7 @@
 
             if (round === 0) {
                 round = 1
+                persistCommandProgress()
                 typeBubble(chat, 'ai', WORKSHOP_GAME.buildPitch, function() {
                     unlockInput(WORKSHOP_GAME.writeTestsPrompt)
                     busy = false
@@ -1395,6 +1718,7 @@
 
             if (round === 1) {
                 round = 2
+                persistCommandProgress()
                 writeTests(function() {
                     unlockInput(WORKSHOP_GAME.runTestsPrompt)
                     busy = false
@@ -1404,6 +1728,7 @@
 
             if (round === 2) {
                 round = 3
+                persistCommandProgress()
                 runTestsOnly(function() {
                     unlockInput(WORKSHOP_GAME.buildAndPlayPrompt)
                     busy = false
@@ -1413,6 +1738,7 @@
 
             if (round === 3) {
                 round = 4
+                persistCommandProgress()
                 runBuild(function() {
                     typeBubble(chat, 'ai', WORKSHOP_GAME.buildDone, function() {
                         showResult(result, 'ok', '')
@@ -1429,8 +1755,9 @@
         })
 
         storyStepControls[3] = {
-            enable: function() {
-                if (!isStoryDone(3)) unlockInput(WORKSHOP_GAME.buildRequestPrompt)
+            enable: function(shouldFocus) {
+                if (isStoryDone(3) || round >= commandPrompts.length) return
+                unlockInput(commandPrompts[round], shouldFocus)
             }
         }
 
@@ -1446,6 +1773,11 @@
                 guided.refreshSend()
             }
         }
+
+        var savedCommandRound = 0
+        if (isStoryDone(3)) savedCommandRound = 4
+        else if (storyFlow.demos && storyFlow.demos.command) savedCommandRound = storyFlow.demos.command.round || 0
+        if (savedCommandRound > 0) restoreCommandProgress(savedCommandRound)
     }
 
     // ----- Step 4: play-test — controlled via chat --------------------------
@@ -1510,13 +1842,13 @@
         input.disabled = true
         guided.refreshSend()
 
-        function unlockPlayInput() {
+        function unlockPlayInput(shouldFocus) {
             guided.setTarget(WORKSHOP_GAME.playtestPrompt)
             input.disabled = false
             sendBtn.disabled = false
             guided.setInputLocked(false)
             guided.refreshSend()
-            focusStoryInput(input)
+            if (shouldFocus !== false) focusStoryInput(input)
         }
 
         function send() {
@@ -1556,8 +1888,8 @@
         })
 
         storyStepControls[4] = {
-            enable: function() {
-                if (!isStoryDone(4)) unlockPlayInput()
+            enable: function(shouldFocus) {
+                if (!isStoryDone(4)) unlockPlayInput(shouldFocus)
             }
         }
 
@@ -1571,6 +1903,26 @@
                 sendBtn.disabled = true
                 guided.refreshSend()
             }
+        }
+
+        if (isStoryDone(4)) {
+            chat.innerHTML = ''
+            addBubble(chat, 'user', WORKSHOP_GAME.playtestPrompt)
+            addBubble(chat, 'tool', 'Open browser  file:///…/src/index.html — built game')
+            addBubble(chat, 'tool', 'Play  Platform Hopper — collect factory sparks')
+            addBubble(chat, 'tool', 'Check  does the built game match DESIGN.md?')
+            addBubble(chat, 'ai', 'Looks good — 3 sparks collected and you reached the exit.')
+            showResult(result, 'ok', '')
+            score = goal
+            scoreEl.textContent = String(goal)
+            player.style.left = coinPos[2].left + 'px'
+            player.style.top = coinPos[2].top + 'px'
+            for (var pc = 0; pc < coins.length; pc++) coins[pc].classList.add('collected')
+            actualEl.textContent = 'Sparks = ' + goal + ', exit reached'
+            actualRow.classList.add('match')
+            matchEl.hidden = false
+            input.disabled = true
+            sendBtn.disabled = true
         }
     }
 
@@ -1587,13 +1939,15 @@
         initTabs()
         initTutorialCelebrate()
         initStorySkip()
+        storyFlow = loadStoryState()
+        reconcileStoryDemos()
         initDemo()
-        applyStoryLocks()
-        unlockStoryStep(1)
+        restoreStoryUI()
         initFirst()
         initNext()
         initPublish()
         initChecklist()
+        syncStoryChecklist()
     }
 
     if (document.readyState === 'loading') {
