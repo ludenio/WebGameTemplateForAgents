@@ -10,20 +10,29 @@
     var STORAGE_KEY = 'workshopConsole.checklist.v1'
     var STORY_STORAGE_KEY = 'workshopConsole.story.v1'
 
+    var tabSections = {
+        intro:   'Chat vs agent',
+        first:   'New game prompt',
+        next:    'Change prompt',
+        publish: 'Publish prompt',
+        steps:   'Checklist'
+    }
+
     var checklistItems = [
-        { id: 'concept', text: 'Understand how an agent differs from a plain chat' },
+        { id: 'concept', text: 'Understand how an agent differs from a plain chat', tab: 'intro' },
         { id: 'account', text: 'Create a GitHub account' },
         { id: 'desktop', text: 'Install GitHub Desktop' },
         { id: 'agent-app', text: 'Install an AI agent app (e.g. Cursor)' },
         { id: 'clone',   text: 'Make your own copy of the template and clone it' },
         { id: 'open-agent', text: 'Open the cloned game folder in your agent app' },
         { id: 'idea',    text: 'Write your game idea' },
-        { id: 'send',    text: 'Send the first prompt to the agent' },
+        { id: 'send',    text: 'Send the new game prompt to the agent', tab: 'first' },
         { id: 'design',  text: 'Review and approve the design (DESIGN.md)' },
         { id: 'plan',    text: 'Approve the task plan (TODO.md)' },
         { id: 'play',    text: 'Open the game and play it' },
-        { id: 'iterate', text: 'Make a change with the "Change a game" prompt' },
-        { id: 'publish', text: 'Publish the game online and share the link' }
+        { id: 'iterate', text: 'Send a change prompt to the agent', tab: 'next' },
+        { id: 'publish', text: 'Publish your game online', tab: 'publish' },
+        { id: 'share',   text: 'Share your game online' }
     ]
 
     function $(id) { return document.getElementById(id) }
@@ -81,7 +90,28 @@
         }
     }
 
+    function tabSectionLabel(tabId) {
+        return tabSections[tabId] || tabId
+    }
+
+    function goToTabSection(tabId) {
+        switchToTab(tabId)
+        requestAnimationFrame(function() {
+            var nav = $('tabs')
+            if (nav) nav.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        })
+    }
+
+    function initTabLabels() {
+        var buttons = document.querySelectorAll('.tab-btn')
+        for (var i = 0; i < buttons.length; i++) {
+            var tabId = buttons[i].getAttribute('data-tab')
+            if (tabSections[tabId]) buttons[i].textContent = tabSections[tabId]
+        }
+    }
+
     function initTabs() {
+        initTabLabels()
         var buttons = document.querySelectorAll('.tab-btn')
         for (var i = 0; i < buttons.length; i++) {
             buttons[i].addEventListener('click', function() {
@@ -271,6 +301,10 @@
                 delete state.tools
                 saveChecklistState(state)
             }
+            if (state.publish && !Object.prototype.hasOwnProperty.call(state, 'share')) {
+                state.share = true
+                saveChecklistState(state)
+            }
             return state
         } catch (e) {
             return {}
@@ -340,6 +374,18 @@
 
                 li.appendChild(cb)
                 li.appendChild(label)
+
+                if (item.tab) {
+                    var tabBtn = document.createElement('button')
+                    tabBtn.type = 'button'
+                    tabBtn.className = 'checklist-tab-btn'
+                    tabBtn.textContent = 'Open: ' + tabSectionLabel(item.tab)
+                    tabBtn.addEventListener('click', function() {
+                        goToTabSection(item.tab)
+                    })
+                    li.appendChild(tabBtn)
+                }
+
                 list.appendChild(li)
             })(checklistItems[i])
         }
@@ -1023,9 +1069,7 @@
     }
 
     function goToChecklistTab() {
-        switchToTab('steps')
-        var section = document.querySelector('.tab-section[data-tab="steps"]')
-        if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        goToTabSection('steps')
     }
 
     function showTutorialComplete(quiet) {
