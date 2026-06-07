@@ -1,34 +1,62 @@
-/* docs/styles.css — Workshop Console, styled after cursor.com.
+/* docs/styles.css — Workshop Console, styled after cursor.com (warm dark theme).
    Plain CSS, no build step, no external fonts. Works via file:/// and GitHub Pages.
-   The look is a deep-black canvas with a soft radial glow, hairline borders,
-   rounded surfaces, a clean system sans stack and gentle transitions. */
+   Palette mirrors cursor.com's dark theme: a warm near-black canvas (#14120b),
+   warm off-white text (#edecec), the Cursor brand orange (#f54e00) for primary
+   actions, a Cursor blue (#2268ff) for informational accents, hairline borders
+   derived from the foreground, modest 8–16px radii and gentle transitions. */
 
 :root {
-    --bg:        #060606;
-    --bg-soft:   #0d0d0f;
-    --panel:     #0f0f12;
-    --panel-2:   #161619;
-    --elevated:  #1b1b20;
-    --border:    rgba(255, 255, 255, 0.09);
-    --border-strong: rgba(255, 255, 255, 0.16);
-    --text:      #f2f2f4;
-    --text-2:    #c9c9d1;
-    --muted:     #8a8a96;
-    --faint:     #5c5c66;
-    --accent:    #ffffff;
-    --accent-ink:#0a0a0a;
-    --blue:      #6e8bff;
-    --violet:    #9a7bff;
-    --green:     #4ade80;
-    --amber:     #f5b945;
-    --danger:    #ff6b6b;
-    --radius:    14px;
-    --radius-sm: 10px;
-    --radius-lg: 20px;
-    --shadow:    0 1px 0 rgba(255,255,255,0.04) inset, 0 18px 50px -20px rgba(0,0,0,0.8);
+    /* Warm dark surfaces (cursor.com dark theme) */
+    --bg:        #14120b;
+    --bg-soft:   #1b1913;
+    --panel:     #1b1913;
+    --panel-2:   #201e18;
+    --elevated:  #252219;
+    /* Borders = foreground (#edecec) over transparent */
+    --border:        rgba(237, 236, 236, 0.10);
+    --border-strong: rgba(237, 236, 236, 0.20);
+    /* Text tiers */
+    --text:      #edecec;
+    --text-2:    #d7d6d5;
+    --muted:     rgba(237, 236, 236, 0.55);
+    --faint:     rgba(237, 236, 236, 0.38);
+    /* Primary action = foreground color (cursor.com button-bg = fg), dark ink */
+    --accent:       #edecec;
+    --accent-ink:   #14120b;
+    --accent-hover: #d7d6d5;   /* fg-02 — cursor button hover */
+    --card-03:      #26241e;   /* cursor secondary button surface */
+    --card-03-hover:#2e2c25;
+    /* Cursor brand orange — sparing highlight accent only */
+    --brand:     #f54e00;
+    /* Cursor blue for informational accents + cursor lavender */
+    --blue:      #2268ff;
+    --violet:    #8c89e7;
+    --green:     #5fcf5b;
+    --amber:     #d3c680;
+    --danger:    #e5484d;
+    --radius:    12px;
+    --radius-sm: 8px;
+    --radius-lg: 16px;
+    --shadow:    0 1px 0 rgba(255,255,255,0.03) inset, 0 12px 40px -24px rgba(0,0,0,0.7);
     --font:      "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    --mono:      "SF Mono", "JetBrains Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    --mono:      "Berkeley Mono", "SF Mono", "JetBrains Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    /* Cursor motion tokens */
+    --dur:       0.14s;
+    --dur-slow:  0.25s;
+    --ease:      cubic-bezier(0, 0, 0.2, 1);
 }
+
+/* Cursor-style focus: a crisp foreground outline, never a soft glow. */
+:focus-visible {
+    outline: 2px solid var(--text);
+    outline-offset: 3px;
+}
+.btn:focus-visible,
+.tab-btn:focus-visible,
+.mode-btn:focus-visible,
+.chip:focus-visible,
+.quick-card:focus-visible,
+.reset-link:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -37,8 +65,8 @@ html { scroll-behavior: smooth; }
 body {
     background-color: var(--bg);
     background-image:
-        radial-gradient(1000px 600px at 50% -8%, rgba(110, 139, 255, 0.12) 0%, transparent 62%),
-        radial-gradient(700px 500px at 88% 4%, rgba(154, 123, 255, 0.08) 0%, transparent 60%);
+        radial-gradient(1100px 620px at 50% -10%, rgba(245, 78, 0, 0.10) 0%, transparent 60%),
+        radial-gradient(760px 520px at 90% 2%, rgba(245, 78, 0, 0.05) 0%, transparent 62%);
     background-attachment: fixed;
     color: var(--text);
     font-family: var(--font);
@@ -116,7 +144,7 @@ header.hero h1 {
     letter-spacing: -0.03em;
     margin-bottom: 22px;
     font-weight: 600;
-    background: linear-gradient(180deg, #ffffff 0%, #b9b9c4 100%);
+    background: linear-gradient(180deg, #fdfcf9 0%, #b3b1a6 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -157,9 +185,9 @@ header.hero p.tagline {
 }
 
 .tab-btn {
-    background: rgba(255, 255, 255, 0.04);
-    color: var(--text-2);
-    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid transparent;
     border-radius: 999px;
     padding: 9px 16px;
     font-family: inherit;
@@ -167,17 +195,15 @@ header.hero p.tagline {
     font-weight: 500;
     letter-spacing: -0.01em;
     cursor: pointer;
-    transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    transition: color var(--dur) var(--ease), background var(--dur) var(--ease), border-color var(--dur) var(--ease);
     white-space: nowrap;
 }
 
-.tab-btn:hover { color: var(--text); background: rgba(255, 255, 255, 0.08); border-color: var(--border-strong); }
+.tab-btn:hover { color: var(--text); background: rgba(237, 236, 236, 0.06); }
 .tab-btn.active {
     background: var(--accent);
     color: var(--accent-ink);
-    border-color: transparent;
-    font-weight: 600;
-    box-shadow: 0 6px 20px -8px rgba(255,255,255,0.4);
+    border-color: var(--accent);
 }
 
 /* Panels --------------------------------------------------------------- */
@@ -228,16 +254,15 @@ header.hero p.tagline {
     font-size: 14.5px;
     font-family: inherit;
     resize: vertical;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
 }
 .field input::placeholder,
 .field textarea::placeholder { color: var(--faint); }
 .field input:focus,
 .field textarea:focus {
     outline: none;
-    border-color: var(--border-strong);
+    border-color: var(--text);
     background: var(--panel);
-    box-shadow: 0 0 0 3px rgba(110, 139, 255, 0.18);
 }
 .field textarea { min-height: 110px; line-height: 1.6; }
 
@@ -302,11 +327,10 @@ header.hero p.tagline {
     border-radius: var(--radius-sm);
     background: var(--bg-soft);
     overflow: hidden;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: border-color var(--dur) var(--ease);
 }
 .domain-input:focus-within {
-    border-color: var(--border-strong);
-    box-shadow: 0 0 0 3px rgba(110, 139, 255, 0.18);
+    border-color: var(--text);
 }
 .domain-input input {
     border: none;
@@ -333,18 +357,17 @@ header.hero p.tagline {
 /* Chips ---------------------------------------------------------------- */
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
 .chip {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid var(--border);
+    background: transparent;
+    border: 1px solid var(--border-strong);
     border-radius: 999px;
     color: var(--text-2);
     padding: 8px 14px;
     font-family: inherit;
     font-size: 13px;
     cursor: pointer;
-    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease, transform 0.1s ease;
+    transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease), background var(--dur) var(--ease);
 }
-.chip:hover { border-color: var(--border-strong); color: var(--text); background: rgba(255,255,255,0.07); }
-.chip:active { transform: scale(0.97); }
+.chip:hover { border-color: var(--text); color: var(--text); background: rgba(237, 236, 236, 0.06); }
 
 /* Preview / output ----------------------------------------------------- */
 .preview-head {
@@ -380,27 +403,26 @@ pre.preview {
 .btn {
     background: var(--accent);
     color: var(--accent-ink);
-    border: 1px solid transparent;
+    border: 1px solid var(--accent);
     border-radius: 999px;
     padding: 11px 20px;
     font-family: inherit;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
+    line-height: 1;
     letter-spacing: -0.01em;
     cursor: pointer;
-    transition: transform 0.1s ease, box-shadow 0.2s ease, background 0.2s ease, opacity 0.2s ease;
-    box-shadow: 0 8px 24px -10px rgba(255,255,255,0.5);
+    transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
 }
-.btn:hover { transform: translateY(-1px); box-shadow: 0 12px 28px -10px rgba(255,255,255,0.6); }
-.btn:active { transform: translateY(0); opacity: 0.9; }
+.btn:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+.btn:active { background: var(--accent); border-color: var(--accent); }
 .btn.secondary {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--card-03);
     color: var(--text);
     border-color: var(--border);
-    box-shadow: none;
 }
-.btn.secondary:hover { background: rgba(255, 255, 255, 0.09); border-color: var(--border-strong); }
-.btn.copied { background: var(--green); color: #06210f; box-shadow: 0 10px 26px -10px rgba(74,222,128,0.6); }
+.btn.secondary:hover { background: var(--card-03-hover); border-color: var(--border-strong); }
+.btn.copied { background: var(--green); color: #06210f; border-color: var(--green); }
 
 .btn-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
 
@@ -473,16 +495,16 @@ pre.preview {
 .demo-step-badge {
     display: inline-flex;
     align-items: center;
-    background: rgba(110, 139, 255, 0.16);
+    background: rgba(34, 104, 255, 0.16);
     color: #b9c5ff;
-    border: 1px solid rgba(110, 139, 255, 0.35);
+    border: 1px solid rgba(34, 104, 255, 0.35);
     border-radius: 999px;
     padding: 3px 11px;
     font-size: 11.5px;
     font-weight: 600;
     margin-right: 10px;
 }
-.demo-step-badge.alt  { background: rgba(154, 123, 255, 0.16); color: #d2c4ff; border-color: rgba(154,123,255,0.35); }
+.demo-step-badge.alt  { background: rgba(140, 137, 231, 0.16); color: #d2c4ff; border-color: rgba(154,123,255,0.35); }
 .demo-step-badge.alt2 { background: rgba(245, 185, 69, 0.16);  color: #ffd98c; border-color: rgba(245,185,69,0.35); }
 .demo-step-badge.alt3 { background: rgba(52, 211, 153, 0.16);  color: #86efac; border-color: rgba(52,211,153,0.35); }
 .demo-story-lead {
@@ -521,7 +543,6 @@ pre.preview {
 .mode-btn.active {
     background: var(--accent);
     color: var(--accent-ink);
-    box-shadow: 0 6px 18px -8px rgba(255, 255, 255, 0.4);
 }
 
 .demo-grid {
@@ -563,8 +584,8 @@ pre.preview {
 .bubble.ai   { align-self: flex-start; background: var(--elevated); color: var(--text); }
 .bubble.tool {
     align-self: flex-start;
-    background: rgba(110, 139, 255, 0.08);
-    border: 1px solid rgba(110, 139, 255, 0.3);
+    background: rgba(34, 104, 255, 0.08);
+    border: 1px solid rgba(34, 104, 255, 0.3);
     color: #b9c5ff;
     font-family: var(--mono);
     font-size: 11.5px;
@@ -658,7 +679,7 @@ pre.preview {
     padding: 28px 20px 24px;
     border-radius: var(--radius);
     border: 1px solid rgba(74, 222, 128, 0.45);
-    background: linear-gradient(165deg, rgba(74, 222, 128, 0.14) 0%, rgba(110, 139, 255, 0.1) 55%, var(--bg-soft) 100%);
+    background: linear-gradient(165deg, rgba(74, 222, 128, 0.14) 0%, rgba(34, 104, 255, 0.1) 55%, var(--bg-soft) 100%);
     box-shadow: 0 20px 50px -24px rgba(74, 222, 128, 0.55);
     overflow: hidden;
     text-align: center;
@@ -959,8 +980,8 @@ pre.preview {
 }
 /* Markdown — blue doc */
 .fe-i-md {
-    background: rgba(110, 139, 255, 0.2);
-    border: 1px solid rgba(110, 139, 255, 0.4);
+    background: rgba(34, 104, 255, 0.2);
+    border: 1px solid rgba(34, 104, 255, 0.4);
 }
 .fe-i-md::after {
     content: "";
@@ -969,8 +990,8 @@ pre.preview {
     bottom: 3px;
     width: 7px;
     height: 7px;
-    border-right: 2px solid rgba(110, 139, 255, 0.8);
-    border-bottom: 2px solid rgba(110, 139, 255, 0.8);
+    border-right: 2px solid rgba(34, 104, 255, 0.8);
+    border-bottom: 2px solid rgba(34, 104, 255, 0.8);
 }
 /* HTML — orange */
 .fe-i-html {
@@ -1038,8 +1059,8 @@ pre.preview {
     to   { opacity: 0; transform: scale(0.45); }
 }
 .fe-grid-item.is-active {
-    background: rgba(110, 139, 255, 0.14);
-    border-color: rgba(110, 139, 255, 0.38);
+    background: rgba(34, 104, 255, 0.14);
+    border-color: rgba(34, 104, 255, 0.38);
 }
 .fe-grid-item.is-active .fe-label { color: #d6ffe4; }
 .fe-grid-item.is-new .fe-label {
@@ -1104,20 +1125,18 @@ pre.preview {
     padding: 11px 16px;
     font-family: inherit;
     font-size: 13.5px;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: border-color var(--dur) var(--ease);
 }
 .demo-input-row input::placeholder { color: var(--faint); }
 .demo-input-row input:focus {
     outline: none;
-    border-color: var(--border-strong);
-    box-shadow: 0 0 0 3px rgba(110, 139, 255, 0.18);
+    border-color: var(--text);
 }
 .demo-input-row input.guided-input:not(:disabled):placeholder-shown {
-    border-color: rgba(110, 139, 255, 0.35);
+    border-color: rgba(34, 104, 255, 0.45);
 }
 .demo-input-row input.guided-input:not(:disabled):not(:placeholder-shown) {
-    border-color: rgba(74, 222, 128, 0.45);
-    box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.12);
+    border-color: rgba(95, 207, 91, 0.55);
 }
 .demo-input-row .btn:disabled {
     opacity: 0.45;
@@ -1193,9 +1212,9 @@ pre.preview {
     cursor: not-allowed;
 }
 .demo-actions .chip:disabled:hover {
-    border-color: var(--border);
+    border-color: var(--border-strong);
     color: var(--text-2);
-    background: rgba(255, 255, 255, 0.04);
+    background: transparent;
 }
 
 /* Scene 2–3: terminal + browser play-test -------------------------------- */
@@ -1406,15 +1425,15 @@ ul.checklist input[type="checkbox"] {
     transition: background 0.15s ease, border-color 0.15s ease;
 }
 ul.checklist input[type="checkbox"]:checked {
-    background: var(--green);
-    border-color: var(--green);
+    background: var(--accent);
+    border-color: var(--accent);
 }
 ul.checklist input[type="checkbox"]:checked::after {
     content: "";
     position: absolute;
     left: 6px; top: 2px;
     width: 5px; height: 10px;
-    border: solid #06210f;
+    border: solid var(--accent-ink);
     border-width: 0 2px 2px 0;
     transform: rotate(45deg);
 }
@@ -1431,7 +1450,7 @@ ul.checklist li.done label { color: var(--faint); text-decoration: line-through;
     flex-shrink: 0;
     align-self: center;
     margin-left: auto;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--card-03);
     color: var(--text-2);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
@@ -1445,7 +1464,7 @@ ul.checklist li.done label { color: var(--faint); text-decoration: line-through;
     cursor: pointer;
     max-width: 13rem;
     white-space: normal;
-    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease), background var(--dur) var(--ease);
 }
 @media (max-width: 560px) {
     .checklist-tab-btn {
@@ -1457,7 +1476,7 @@ ul.checklist li.done label { color: var(--faint); text-decoration: line-through;
 .checklist-tab-btn:hover {
     color: var(--text);
     border-color: var(--border-strong);
-    background: rgba(255, 255, 255, 0.09);
+    background: var(--card-03-hover);
 }
 
 .progress {
@@ -1473,7 +1492,7 @@ ul.checklist li.done label { color: var(--faint); text-decoration: line-through;
     height: 100%;
     width: 0%;
     border-radius: 999px;
-    background: linear-gradient(90deg, var(--blue), var(--violet));
+    background: linear-gradient(90deg, #f54e00, #ff7433);
     transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -1487,9 +1506,9 @@ ul.checklist li.done label { color: var(--faint); text-decoration: line-through;
     text-decoration: underline;
     text-underline-offset: 3px;
     padding: 0;
-    transition: color 0.2s ease;
+    transition: color var(--dur) var(--ease);
 }
-.reset-link:hover { color: var(--danger); }
+.reset-link:hover { color: var(--text); }
 
 /* Helper links / quick actions ----------------------------------------- */
 .quick-grid {
@@ -1502,25 +1521,24 @@ ul.checklist li.done label { color: var(--faint); text-decoration: line-through;
 a.quick-card,
 .quick-card {
     display: block;
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--panel);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 18px 20px;
     color: var(--text);
     text-decoration: none;
-    transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+    transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
 }
 a.quick-card:hover {
     border-color: var(--border-strong);
-    background: rgba(255, 255, 255, 0.06);
-    transform: translateY(-2px);
+    background: var(--panel-2);
 }
 .quick-card .qc-title { font-weight: 600; margin-bottom: 4px; font-size: 15px; letter-spacing: -0.01em; }
 .quick-card .qc-sub { color: var(--muted); font-size: 13px; font-family: var(--mono); }
 
 .note {
-    background: rgba(110, 139, 255, 0.06);
-    border: 1px solid rgba(110, 139, 255, 0.22);
+    background: rgba(34, 104, 255, 0.06);
+    border: 1px solid rgba(34, 104, 255, 0.22);
     border-radius: var(--radius);
     padding: 14px 16px;
     color: var(--text-2);
