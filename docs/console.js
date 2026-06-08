@@ -20,16 +20,28 @@
 
     var checklistItems = [
         { id: 'concept', text: 'Understand how an agent differs from a plain chat', tab: 'intro' },
-        { id: 'account', text: 'Create a GitHub account' },
-        { id: 'desktop', text: 'Install GitHub Desktop' },
-        { id: 'agent-app', text: 'Install an AI agent app (e.g. Cursor)' },
-        { id: 'clone',   text: 'Make your own copy of the template and clone it' },
+        { id: 'account', text: 'Create a GitHub account', links: [
+            { href: 'https://github.com/signup', label: 'Sign up for GitHub' }
+        ] },
+        { id: 'desktop', text: 'Install GitHub Desktop', links: [
+            { href: 'https://desktop.github.com/', label: 'Download GitHub Desktop' }
+        ] },
+        { id: 'agent-account', text: 'Create an AI agent app account (e.g. Cursor)', links: [
+            { href: 'https://cursor.com/', label: 'Sign up for Cursor' }
+        ] },
+        { id: 'agent-app', text: 'Install an AI agent app (e.g. Cursor)', links: [
+            { href: 'https://cursor.com/', label: 'Download Cursor' }
+        ] },
+        { id: 'clone',   text: 'Make your own copy of the template and clone it', links: [
+            { href: 'https://github.com/ludenio/WebGameTemplateForAgents', label: 'Open the template repo' }
+        ] },
         { id: 'open-agent', text: 'Open the cloned game folder in your agent app' },
-        { id: 'idea',    text: 'Write your game idea' },
-        { id: 'send',    text: 'Send the new game prompt to the agent', tab: 'first' },
-        { id: 'design',  text: 'Review and approve the design (DESIGN.md)' },
-        { id: 'plan',    text: 'Approve the task plan (TODO.md)' },
-        { id: 'play',    text: 'Open the game and play it' },
+        { id: 'first-prompt', text: 'Write and send your new game prompt to the agent', tab: 'first' },
+        { id: 'design',  text: 'Review and approve the design (DESIGN.md)', copy: { label: 'Copy: design approved', phrase: 'design' } },
+        { id: 'plan',    text: 'Approve the task plan (TODO.md)', copy: { label: 'Copy: plan approved, build it', phrase: 'plan' } },
+        { id: 'play',    text: 'Open the game and play it', links: [
+            { href: '../src/index.html', label: 'Open the game' }
+        ] },
         { id: 'iterate', text: 'Send a change prompt to the agent', tab: 'next' },
         { id: 'publish', text: 'Publish your game online', tab: 'publish' },
         { id: 'share',   text: 'Share your game online' }
@@ -305,6 +317,12 @@
                 state.share = true
                 saveChecklistState(state)
             }
+            if (state.idea || state.send) {
+                state['first-prompt'] = !!(state.idea || state.send)
+                delete state.idea
+                delete state.send
+                saveChecklistState(state)
+            }
             return state
         } catch (e) {
             return {}
@@ -375,15 +393,50 @@
                 li.appendChild(cb)
                 li.appendChild(label)
 
-                if (item.tab) {
-                    var tabBtn = document.createElement('button')
-                    tabBtn.type = 'button'
-                    tabBtn.className = 'checklist-tab-btn'
-                    tabBtn.textContent = 'Open: ' + tabSectionLabel(item.tab)
-                    tabBtn.addEventListener('click', function() {
-                        goToTabSection(item.tab)
-                    })
-                    li.appendChild(tabBtn)
+                var hasTab = !!item.tab
+                var hasLinks = !!(item.links && item.links.length)
+                var hasCopy = !!(item.copy && item.copy.label && item.copy.phrase)
+                if (hasTab || hasLinks || hasCopy) {
+                    var actions = document.createElement('div')
+                    actions.className = 'checklist-actions'
+
+                    if (hasTab) {
+                        var tabBtn = document.createElement('button')
+                        tabBtn.type = 'button'
+                        tabBtn.className = 'checklist-tab-btn'
+                        tabBtn.textContent = 'Open: ' + tabSectionLabel(item.tab)
+                        tabBtn.addEventListener('click', function() {
+                            goToTabSection(item.tab)
+                        })
+                        actions.appendChild(tabBtn)
+                    }
+
+                    if (hasCopy) {
+                        var copyBtn = document.createElement('button')
+                        copyBtn.type = 'button'
+                        copyBtn.className = 'checklist-tab-btn'
+                        copyBtn.textContent = item.copy.label
+                        copyBtn.addEventListener('click', function() {
+                            var phrase = window.prompts.approvalPhrases[item.copy.phrase]
+                            if (phrase) copyText(phrase, copyBtn)
+                        })
+                        actions.appendChild(copyBtn)
+                    }
+
+                    if (hasLinks) {
+                        for (var k = 0; k < item.links.length; k++) {
+                            var link = item.links[k]
+                            var a = document.createElement('a')
+                            a.className = 'checklist-tab-btn checklist-link-btn'
+                            a.href = link.href
+                            a.target = '_blank'
+                            a.rel = 'noopener noreferrer'
+                            a.textContent = link.label
+                            actions.appendChild(a)
+                        }
+                    }
+
+                    li.appendChild(actions)
                 }
 
                 list.appendChild(li)
@@ -406,13 +459,6 @@
         })
 
         refreshStepsCelebrate(state)
-
-        $('copy-approve-continue').addEventListener('click', function() {
-            copyText(window.prompts.approvalPhrases.continue, this)
-        })
-        $('copy-approve-run').addEventListener('click', function() {
-            copyText(window.prompts.approvalPhrases.run, this)
-        })
     }
 
     // ----- Platform Hopper workshop story (tab 0) -------------------------
@@ -483,7 +529,7 @@
         firstPrompt: 'Build me Platform Hopper — a browser game: hop moving platforms, avoid pits, reach the exit',
         chatReply: 'I can\'t build games or create files in your project — chat only. Idea: Platform Hopper, a side-scrolling factory platformer (moving platforms, pits, sparks, exit).',
         buildRequestPrompt: 'Let\'s build the game.',
-        buildPitch: 'I can build it — that packages the source into something you can open in a browser and play. First I\'d like to write automated tests: as an agent I verify correctness through test output, not by looking at the screen — that\'s how I know everything works before we build.',
+        buildPitch: 'I can build a playable version. First, tests — I read text well, but I\'m bad at understanding the screen, so I verify through test text output.',
         writeTestsPrompt: 'Good idea, let\'s create auto-tests.',
         testsWritten: 'Automated tests are written — ready to run them.',
         runTestsPrompt: 'Run the auto-tests.',
@@ -1992,6 +2038,7 @@
         initPublish()
         initChecklist()
         syncStoryChecklist()
+        if (isStoryDone(4)) switchToTab('steps')
     }
 
     if (document.readyState === 'loading') {

@@ -145,8 +145,8 @@
     // ----- Shared helper text ---------------------------------------------
 
     var approvalPhrases = {
-        continue: 'I approve, continue.',
-        run:      'I approve, run it.'
+        design: 'Design approved.',
+        plan:   'Plan approved, build it.'
     }
 
     // Example concept chips that fill the idea field.
