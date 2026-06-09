@@ -368,6 +368,19 @@ header.hero p.tagline {
     transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease), background var(--dur) var(--ease);
 }
 .chip:hover { border-color: var(--text); color: var(--text); background: rgba(237, 236, 236, 0.06); }
+.chip.active {
+    border-color: var(--text);
+    color: var(--text);
+    background: rgba(237, 236, 236, 0.1);
+}
+.chip-reset {
+    border-style: dashed;
+    color: var(--muted);
+}
+.chip-reset:hover,
+.chip-reset.active {
+    color: var(--text);
+}
 
 /* Preview / output ----------------------------------------------------- */
 .preview-head {
@@ -1671,3 +1684,167 @@ footer.site .footer-github-logo {
 }
 
 footer.site code { font-size: 0.85em; }
+
+/* Kickoff page (docs/kickoff.html) — fits 16:9 and 3:4 viewports */
+html.kickoff-page {
+    height: 100%;
+    overflow: hidden;
+}
+
+.kickoff-body {
+    height: 100dvh;
+    min-height: 100dvh;
+    max-height: 100dvh;
+    overflow: hidden;
+    padding: 0 clamp(12px, 3vw, 24px) !important;
+    display: flex;
+    flex-direction: column;
+}
+
+.kickoff-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    max-width: 720px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.kickoff-main {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(8px, 1.8dvh, 20px);
+    text-align: center;
+    padding: clamp(10px, 2dvh, 24px) 0;
+}
+
+.kickoff-hero {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(4px, 1dvh, 12px);
+}
+
+.kickoff-mascot {
+    width: clamp(52px, 10dvh, 100px);
+    height: auto;
+    display: block;
+    filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.35));
+}
+
+.kickoff-title {
+    font-size: clamp(22px, 5.5dvh, 52px);
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+    font-weight: 700;
+}
+
+.kickoff-panel {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(6px, 1.4dvh, 14px);
+    width: 100%;
+}
+
+.kickoff-qr-link {
+    flex-shrink: 1;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-lg);
+    background: #fff;
+    padding: clamp(8px, 1.4dvh, 16px);
+    box-shadow: var(--shadow);
+    transition: transform var(--dur-slow) var(--ease), box-shadow var(--dur-slow) var(--ease);
+}
+
+.kickoff-qr-link:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 20px 48px -20px rgba(0,0,0,0.75);
+}
+
+.kickoff-qr {
+    display: block;
+    width: auto;
+    height: auto;
+    max-height: min(46dvh, 58vw);
+    max-width: min(58vw, 46dvh);
+    object-fit: contain;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+.kickoff-url {
+    flex-shrink: 0;
+    color: var(--text);
+    font-size: clamp(15px, 3.2dvh, 28px);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+    word-break: break-all;
+    line-height: 1.2;
+    transition: color var(--dur) var(--ease);
+}
+
+.kickoff-url:hover {
+    color: var(--brand);
+}
+
+.kickoff-note {
+    flex-shrink: 0;
+    color: var(--muted);
+    font-size: clamp(12px, 1.8dvh, 15px);
+    line-height: 1.35;
+    max-width: 34ch;
+}
+
+/* Landscape 16:9 — height is the limiter */
+@media (min-aspect-ratio: 4/3) {
+    .kickoff-qr {
+        max-height: min(50dvh, 36vw);
+        max-width: min(36vw, 50dvh);
+    }
+}
+
+/* Portrait 3:4 — width is the limiter */
+@media (max-aspect-ratio: 3/4) {
+    .kickoff-main {
+        gap: clamp(6px, 1.2dvh, 14px);
+    }
+
+    .kickoff-qr {
+        max-height: min(40dvh, 78vw);
+        max-width: min(78vw, 40dvh);
+    }
+
+    .kickoff-title {
+        font-size: clamp(20px, 4.8dvh, 40px);
+    }
+}
+
+/* Very short viewports (e.g. 1280×720, small laptops) */
+@media (max-height: 720px) {
+    .kickoff-mascot {
+        width: clamp(44px, 8dvh, 72px);
+    }
+
+    .kickoff-qr {
+        max-height: min(44dvh, 52vw);
+        max-width: min(52vw, 44dvh);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .kickoff-qr-link:hover { transform: none; }
+}

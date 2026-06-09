@@ -149,25 +149,80 @@
         plan:   'Plan approved, build it.'
     }
 
-    // Example concept chips that fill the idea field.
+    // Quick-start presets replace every first-game field atomically (no merge).
     var exampleConcepts = [
         {
             label: 'Coin collector',
-            text: 'Top-down view: a small character runs around an island collecting coins before a timer runs out. Coins appear in random spots. Reaching the target score before time ends wins; running out of time loses.'
+            genre: 'Top-down arcade',
+            action: 'Run around an island collecting coins as they appear',
+            goal: 'Reach the target score before the timer runs out',
+            style: 'Bright, simple shapes',
+            winLose: 'Win by reaching the target score before time ends; lose when the timer runs out',
+            idea: 'Coins appear in random spots across the island.'
         },
         {
             label: 'Tiny dungeon crawler',
-            text: 'Top-down dungeon made of rooms. The hero walks room to room, fights slow blob enemies that dissolve into sparkles when defeated, picks up keys, and reaches the exit. Touching too many enemies loses; reaching the exit wins.'
+            genre: 'Top-down dungeon crawler',
+            action: 'Walk room to room, fight blob enemies, pick up keys',
+            goal: 'Reach the exit',
+            style: 'Simple dungeon tiles, sparkle effects on defeated enemies',
+            winLose: 'Win by reaching the exit; lose by touching too many enemies',
+            idea: 'Slow blob enemies dissolve into sparkles when defeated.'
         },
         {
             label: 'Falling-fruit catcher',
-            text: 'A basket at the bottom of the screen moves left and right. Fruit falls from the top at increasing speed. Catching fruit adds points; missing three fruits ends the game. Goal: reach a high score.'
+            genre: 'Arcade reflex game',
+            action: 'Move a basket left and right to catch falling fruit',
+            goal: 'Reach a high score',
+            style: 'Colorful fruit, clean flat shapes',
+            winLose: 'Win by chasing a high score; lose after missing three fruits',
+            idea: 'Fruit falls from the top at increasing speed.'
         },
         {
             label: 'Maze escape',
-            text: 'A character must find the exit of a small maze. Walls block movement, glowing tiles speed you up, and a gentle timer adds pressure. Reaching the exit wins; the timer hitting zero loses.'
+            genre: 'Top-down maze',
+            action: 'Navigate walls, use glowing speed tiles, beat the timer',
+            goal: 'Find and reach the exit',
+            style: 'Simple maze tiles with glowing accent tiles',
+            winLose: 'Win by reaching the exit; lose when the timer hits zero',
+            idea: 'Glowing tiles give a short speed boost.'
         }
     ]
+
+    // Change-prompt presets — worded so they fit any default game idea.
+    var exampleChanges = [
+        {
+            label: 'Speed-up shop',
+            text: 'Add a shop where the player can spend collected progress (score, pickups, or currency — whatever the game already uses) on permanent upgrades, starting with a movement speed boost.'
+        },
+        {
+            label: 'Ramp difficulty',
+            text: 'The game gets too easy over time — add a difficulty curve that ramps up as the player makes progress (faster hazards, tighter timers, tougher obstacles, or more pressure — pick what fits this game).'
+        },
+        {
+            label: 'Star rating',
+            text: 'Replace the current scoring or win tracking with a star-rating system (1–3 stars per run or level, based on how well the player performed).'
+        },
+        {
+            label: 'No timer',
+            text: 'Remove any countdown or time-pressure mechanic — the player should not lose just because time ran out.'
+        }
+    ]
+
+    var CUSTOM_PRESET_LABEL = 'Custom — I\'ll write my own'
+
+    // Normalize a preset object into the six first-game field values.
+    function firstPresetFields(preset) {
+        preset = preset || {}
+        return {
+            genre:   preset.genre   || '',
+            action:  preset.action  || '',
+            goal:    preset.goal    || '',
+            style:   preset.style   || '',
+            winLose: preset.winLose || '',
+            idea:    preset.idea != null ? preset.idea : (preset.text || '')
+        }
+    }
 
     window.prompts = {
         buildFirstPrompt:   buildFirstPrompt,
@@ -175,7 +230,10 @@
         buildNextPrompt:    buildNextPrompt,
         buildPublishPrompt: buildPublishPrompt,
         approvalPhrases:    approvalPhrases,
-        exampleConcepts:    exampleConcepts
+        exampleConcepts:    exampleConcepts,
+        exampleChanges:     exampleChanges,
+        firstPresetFields:  firstPresetFields,
+        CUSTOM_PRESET_LABEL: CUSTOM_PRESET_LABEL
     }
 
 })()

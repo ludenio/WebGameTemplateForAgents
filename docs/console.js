@@ -18,24 +18,21 @@
         steps:   'Checklist'
     }
 
+    var SOURCE_ZIP_URL = 'https://github.com/ludenio/WebGameTemplateForAgents/archive/refs/heads/main.zip'
+
     var checklistItems = [
+        { id: 'download', text: 'Download the project sources (ZIP archive)', links: [
+            { href: SOURCE_ZIP_URL, label: 'Download sources' }
+        ] },
+        { id: 'extract', text: 'Extract the ZIP into a folder on your computer — do not edit files inside the archive' },
         { id: 'concept', text: 'Understand how an agent differs from a plain chat', tab: 'intro' },
-        { id: 'account', text: 'Create a GitHub account', links: [
-            { href: 'https://github.com/signup', label: 'Sign up for GitHub' }
-        ] },
-        { id: 'desktop', text: 'Install GitHub Desktop', links: [
-            { href: 'https://desktop.github.com/', label: 'Download GitHub Desktop' }
-        ] },
         { id: 'agent-account', text: 'Create an AI agent app account (e.g. Cursor)', links: [
-            { href: 'https://cursor.com/', label: 'Sign up for Cursor' }
+            { href: 'https://cursor.com/signup', label: 'Sign up for Cursor' }
         ] },
         { id: 'agent-app', text: 'Install an AI agent app (e.g. Cursor)', links: [
             { href: 'https://cursor.com/', label: 'Download Cursor' }
         ] },
-        { id: 'clone',   text: 'Make your own copy of the template and clone it', links: [
-            { href: 'https://github.com/ludenio/WebGameTemplateForAgents', label: 'Open the template repo' }
-        ] },
-        { id: 'open-agent', text: 'Open the cloned game folder in your agent app' },
+        { id: 'open-agent', text: 'Open the extracted project folder in your agent app' },
         { id: 'first-prompt', text: 'Write and send your new game prompt to the agent', tab: 'first' },
         { id: 'design',  text: 'Review and approve the design (DESIGN.md)', copy: { label: 'Copy: design approved', phrase: 'design' } },
         { id: 'plan',    text: 'Approve the task plan (TODO.md)', copy: { label: 'Copy: plan approved, build it', phrase: 'plan' } },
@@ -134,7 +131,10 @@
 
     // ----- First-game builder --------------------------------------------
 
-    function firstFields() {
+    var FIRST_FIELD_IDS = ['f-genre', 'f-action', 'f-goal', 'f-style', 'f-winlose', 'f-idea']
+    var firstApplySeq = 0
+
+    function readFirstFields() {
         return {
             genre:   $('f-genre').value,
             action:  $('f-action').value,
@@ -145,18 +145,63 @@
         }
     }
 
-    function renderFirst() {
-        var concept = window.prompts.buildConcept(firstFields())
+    // Replace every first-game input from one preset — never merge with old values.
+    function setFirstFields(preset) {
+        var fields = window.prompts.firstPresetFields(preset)
+        $('f-genre').value = fields.genre
+        $('f-action').value = fields.action
+        $('f-goal').value = fields.goal
+        $('f-style').value = fields.style
+        $('f-winlose').value = fields.winLose
+        $('f-idea').value = fields.idea
+    }
+
+    function renderFirst(applySeq) {
+        if (applySeq !== undefined && applySeq !== firstApplySeq) return
+        var concept = window.prompts.buildConcept(readFirstFields())
         $('preview-first').textContent = window.prompts.buildFirstPrompt(concept)
     }
 
+    function setChipActive(chipBoxId, activeChip) {
+        var chips = document.querySelectorAll('#' + chipBoxId + ' .chip')
+        for (var i = 0; i < chips.length; i++) {
+            chips[i].classList.toggle('active', chips[i] === activeChip)
+        }
+    }
+
+    function applyFirstPreset(preset, activeChip) {
+        var seq = ++firstApplySeq
+        setFirstFields(preset)
+        setChipActive('example-chips', activeChip)
+        renderFirst(seq)
+    }
+
+    function addPresetChip(chipBox, label, className, onClick) {
+        var chip = document.createElement('button')
+        chip.type = 'button'
+        chip.className = 'chip' + (className ? ' ' + className : '')
+        chip.textContent = label
+        chip.addEventListener('click', function() {
+            onClick(chip)
+        })
+        chipBox.appendChild(chip)
+        return chip
+    }
+
     function initFirst() {
-        var ids = ['f-genre', 'f-action', 'f-goal', 'f-style', 'f-winlose', 'f-idea']
-        for (var i = 0; i < ids.length; i++) {
-            $(ids[i]).addEventListener('input', renderFirst)
+        for (var i = 0; i < FIRST_FIELD_IDS.length; i++) {
+            $(FIRST_FIELD_IDS[i]).addEventListener('input', function() {
+                firstApplySeq++
+                setChipActive('example-chips', null)
+                renderFirst()
+            })
         }
 
         var chipBox = $('example-chips')
+        addPresetChip(chipBox, window.prompts.CUSTOM_PRESET_LABEL, 'chip-reset', function(chip) {
+            applyFirstPreset({}, chip)
+        })
+
         var examples = window.prompts.exampleConcepts
         for (var e = 0; e < examples.length; e++) {
             (function(example) {
@@ -165,8 +210,7 @@
                 chip.className = 'chip'
                 chip.textContent = example.label
                 chip.addEventListener('click', function() {
-                    $('f-idea').value = example.text
-                    renderFirst()
+                    applyFirstPreset(example, chip)
                 })
                 chipBox.appendChild(chip)
             })(examples[e])
@@ -180,12 +224,48 @@
 
     // ----- Next-iteration builder ----------------------------------------
 
-    function renderNext() {
+    var nextApplySeq = 0
+
+    function renderNext(applySeq) {
+        if (applySeq !== undefined && applySeq !== nextApplySeq) return
         $('preview-next').textContent = window.prompts.buildNextPrompt($('n-change').value)
     }
 
+    function applyChangePreset(preset, activeChip) {
+        var seq = ++nextApplySeq
+        $('n-change').value = preset.text || ''
+        setChipActive('change-chips', activeChip)
+        renderNext(seq)
+    }
+
     function initNext() {
-        $('n-change').addEventListener('input', renderNext)
+        $('n-change').addEventListener('input', function() {
+            nextApplySeq++
+            setChipActive('change-chips', null)
+            renderNext()
+        })
+
+        var chipBox = $('change-chips')
+        var examples = window.prompts.exampleChanges
+        if (chipBox && examples) {
+            addPresetChip(chipBox, window.prompts.CUSTOM_PRESET_LABEL, 'chip-reset', function(chip) {
+                applyChangePreset({ text: '' }, chip)
+            })
+
+            for (var e = 0; e < examples.length; e++) {
+                (function(example) {
+                    var chip = document.createElement('button')
+                    chip.type = 'button'
+                    chip.className = 'chip'
+                    chip.textContent = example.label
+                    chip.addEventListener('click', function() {
+                        applyChangePreset(example, chip)
+                    })
+                    chipBox.appendChild(chip)
+                })(examples[e])
+            }
+        }
+
         $('copy-next').addEventListener('click', function() {
             copyText($('preview-next').textContent, this)
         })
@@ -321,6 +401,16 @@
                 state['first-prompt'] = !!(state.idea || state.send)
                 delete state.idea
                 delete state.send
+                saveChecklistState(state)
+            }
+            if (state.account || state.desktop || state.clone) {
+                state.download = state.download || true
+                if (state.clone) {
+                    state.extract = state.extract || true
+                }
+                delete state.account
+                delete state.desktop
+                delete state.clone
                 saveChecklistState(state)
             }
             return state
