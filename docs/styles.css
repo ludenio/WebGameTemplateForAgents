@@ -1732,17 +1732,10 @@ html.kickoff-page {
 }
 
 .kickoff-mascot {
-    width: clamp(52px, 10dvh, 100px);
+    width: clamp(64px, 12dvh, 120px);
     height: auto;
     display: block;
     filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.35));
-}
-
-.kickoff-title {
-    font-size: clamp(22px, 5.5dvh, 52px);
-    line-height: 1.05;
-    letter-spacing: -0.04em;
-    font-weight: 700;
 }
 
 .kickoff-panel {
@@ -1788,7 +1781,7 @@ html.kickoff-page {
 .kickoff-url {
     flex-shrink: 0;
     color: var(--text);
-    font-size: clamp(15px, 3.2dvh, 28px);
+    font-size: clamp(24px, 5dvh, 44px);
     font-weight: 600;
     letter-spacing: -0.02em;
     text-decoration: none;
@@ -1801,12 +1794,43 @@ html.kickoff-page {
     color: var(--brand);
 }
 
-.kickoff-note {
+.kickoff-note,
+.kickoff-steps {
     flex-shrink: 0;
-    color: var(--muted);
-    font-size: clamp(12px, 1.8dvh, 15px);
-    line-height: 1.35;
-    max-width: 34ch;
+    color: var(--text-2);
+    font-size: clamp(20px, 3.4dvh, 30px);
+    line-height: 1.4;
+    max-width: 44ch;
+    text-align: left;
+    margin: 0 auto;
+}
+
+.kickoff-steps {
+    list-style: none;
+    counter-reset: kickoff-step;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(4px, 0.8dvh, 8px);
+}
+
+.kickoff-steps li {
+    counter-increment: kickoff-step;
+    position: relative;
+    padding-left: 1.6em;
+}
+
+.kickoff-steps li::before {
+    content: counter(kickoff-step) ".";
+    position: absolute;
+    left: 0;
+    color: var(--text-2);
+    font-weight: 600;
+}
+
+.kickoff-steps code {
+    font-family: var(--mono);
+    font-size: 0.95em;
+    color: var(--text);
 }
 
 /* Landscape 16:9 — height is the limiter */
@@ -1828,8 +1852,8 @@ html.kickoff-page {
         max-width: min(78vw, 40dvh);
     }
 
-    .kickoff-title {
-        font-size: clamp(20px, 4.8dvh, 40px);
+    .kickoff-steps {
+        font-size: clamp(18px, 3dvh, 26px);
     }
 }
 
@@ -1840,8 +1864,12 @@ html.kickoff-page {
     }
 
     .kickoff-qr {
-        max-height: min(44dvh, 52vw);
-        max-width: min(52vw, 44dvh);
+        max-height: min(42dvh, 52vw);
+        max-width: min(52vw, 42dvh);
+    }
+
+    .kickoff-steps {
+        font-size: clamp(17px, 2.6dvh, 24px);
     }
 }
 
