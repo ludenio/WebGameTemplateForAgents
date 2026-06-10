@@ -674,7 +674,8 @@ pre.preview {
 .intro-panel {
     position: relative;
 }
-.intro-head {
+.intro-head,
+.panel-head {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
@@ -683,7 +684,9 @@ pre.preview {
     margin-bottom: 10px;
 }
 .intro-panel .intro-title { margin: 0; }
-.intro-head .reset-link { flex-shrink: 0; }
+.intro-head .reset-link,
+.panel-head .reset-link { flex-shrink: 0; }
+.panel-head h2 { margin: 0; }
 
 /* Tutorial complete — confetti + summary */
 .tutorial-celebrate {

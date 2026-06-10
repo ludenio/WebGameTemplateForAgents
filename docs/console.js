@@ -37,7 +37,7 @@
         { id: 'design',  text: 'Review and approve the design (DESIGN.md)', copy: { label: 'Copy: design approved', phrase: 'design' } },
         { id: 'plan',    text: 'Approve the task plan (TODO.md)', copy: { label: 'Copy: plan approved, build it', phrase: 'plan' } },
         { id: 'play',    text: 'Open the game and play it', links: [
-            { href: '../src/index.html', label: 'Open the game' }
+            { href: '..' + '/' + 'src' + '/' + 'index.html', label: 'Open the game' }
         ] },
         { id: 'iterate', text: 'Send a change prompt to the agent', tab: 'next' },
         { id: 'publish', text: 'Publish your game online', tab: 'publish' },
@@ -616,8 +616,8 @@
     var WORKSHOP_GAME = {
         name: 'Platform Hopper',
         sparksGoal: 3,
-        firstPrompt: 'Build me Platform Hopper — a browser game: hop moving platforms, avoid pits, reach the exit',
-        chatReply: 'I can\'t build games or create files in your project — chat only. Idea: Platform Hopper, a side-scrolling factory platformer (moving platforms, pits, sparks, exit).',
+        firstPrompt: 'Build me a game, please.',
+        chatReply: 'I can\'t build games or create files — chat only. If you want, I can describe an idea for a game, but you should build it yourself. For example, your game may be: Platform Hopper, a side-scrolling factory platformer (moving platforms, pits, sparks, exit).',
         buildRequestPrompt: 'Let\'s build the game.',
         buildPitch: 'I can build a playable version. First, tests — I read text well, but I\'m bad at understanding the screen, so I verify through test text output.',
         writeTestsPrompt: 'Good idea, let\'s create auto-tests.',
@@ -637,64 +637,191 @@
             '',
             'Fantasy: a springy maintenance robot crossing a factory at night'
         ],
+        todoLines: [
+            '# TODO — Platform Hopper',
+            '',
+            '1. code.js — speed, jump, gravity',
+            '2. store + playerSystem — movement, pits, checkpoints',
+            '3. platformSystem — moving platforms per zone',
+            '4. collectibles — 3 sparks, exit gate',
+            '5. tests — deterministic movement + spark pickup replay'
+        ],
         agentSteps: [
             {
-                file: 'game-idea.txt',
-                icon: 'fe-i-txt',
-                prompt: 'Make me a game idea',
-                tool: 'Create  game-idea.txt',
-                ai: 'I came up with Platform Hopper — a factory platformer — and saved the idea to game-idea.txt.',
+                file: 'DESIGN.md',
+                icon: 'fe-i-md',
+                prompt: 'Build me a game, please.',
+                tool: 'Create  DESIGN.md',
+                ai: 'Sure, let\'s create the game design document. I like reading text files in Markdown format, which is why the files you\'ll see are named DESIGN.md, where .md means Markdown. Do you want me to create an implementation plan?',
                 lines: null
             },
             {
-                special: 'design-and-plan',
-                prompt: 'Let\'s make the game',
-                mdFile: 'DESIGN.md',
-                mdIcon: 'fe-i-md',
-                mdLines: [
-                    '# Platform Hopper — design',
-                    '',
-                    '## Core loop',
-                    'Cross 3 factory zones; platforms speed up each zone.',
-                    '',
-                    '## Player verbs',
-                    '- run  - jump',
-                    '',
-                    '## Collectibles',
-                    '3 factory sparks per zone before the exit platform unlocks',
-                    '',
-                    '## Failure',
-                    'Pit = restart at last checkpoint'
-                ],
-                todoFile: 'TODO.md',
-                todoIcon: 'fe-i-md',
-                todoLines: [
-                    '# TODO — Platform Hopper',
-                    '',
-                    '1. config/player.js — speed, jump, gravity',
-                    '2. store + playerSystem — movement, pits, checkpoints',
-                    '3. platformSystem — moving platforms per zone',
-                    '4. collectibles — 3 sparks, exit gate',
-                    '5. tests — deterministic movement + spark pickup replay'
-                ],
-                aiExplain: 'For agents, Markdown files work better than plain .txt — clearer structure and easier to update. I\'ll turn your idea into DESIGN.md, remove the notes file, and add a to-do list so we can track what\'s done.',
-                aiDone: 'DESIGN.md and TODO.md are ready — we can start building.',
-                deleteFile: 'game-idea.txt'
+                file: 'TODO.md',
+                icon: 'fe-i-md',
+                prompt: 'Yes, create a plan',
+                tool: 'Create  TODO.md',
+                ai: 'I turned that into a concrete to-do list.',
+                lines: null
             },
             {
-                file: 'src/config/player.js',
+                file: 'code.js',
                 icon: 'fe-i-js',
                 prompt: 'Let\'s start building',
-                tool: 'Create  src/config/player.js',
-                ai: 'First step done — I added player movement settings in src/config/player.js.',
+                tool: 'Create  code.js',
+                ai: 'Done — I replaced the placeholder with a real `code.js` module and added movement, collisions, collectibles, and checkpoint logic.',
                 lines: [
+                    '/* code.js */',
+                    '',
                     ';(function() {',
                     "  'use strict'",
+                    '',
+                    '  var world = {',
+                    '    gravity: 0.55,',
+                    '    terminalX: 1200,',
+                    '    terminalY: 420,',
+                    '    lastRespawnX: 90,',
+                    '    lastRespawnY: 280,',
+                    '    checkpoints: [',
+                    '      [140, 280],',
+                    '      [460, 240],',
+                    '      [790, 190]',
+                    '    ]',
+                    '  }',
+                    '',
                     '  window.config = window.config || {}',
                     '  window.config.player = {',
-                    '    speed: 4,',
-                    '    jumpForce: 12,',
-                    '    gravity: 0.55',
+                    '    speed: 4.2,',
+                    '    acceleration: 0.45,',
+                    '    friction: 0.75,',
+                    '    jumpImpulse: 12,',
+                    '    maxJumps: 2,',
+                    '    terminalX: world.terminalX,',
+                    '    terminalY: world.terminalY',
+                    '  }',
+                    '',
+                    '  function clamp(v, min, max) {',
+                    '    return Math.min(Math.max(v, min), max)',
+                    '  }',
+                    '',
+                    '  var playerState = {',
+                    '    x: 120,',
+                    '    y: 260,',
+                    '    vx: 0,',
+                    '    vy: 0,',
+                    '    facing: 1,',
+                    '    isGrounded: true,',
+                    '    isAlive: true,',
+                    '    jumpsLeft: 2,',
+                    '    collected: 0',
+                    '  }',
+                    '',
+                    '  var worldTiles = [',
+                    '    { kind: \"platform\", x1: 0, y1: 340, x2: 220, y2: 360 },',
+                    '    { kind: \"platform\", x1: 260, y1: 300, x2: 420, y2: 314 },',
+                    '    { kind: \"platform\", x1: 470, y1: 250, x2: 610, y2: 268 },',
+                    '    { kind: \"hazard\",   x1: 640, y1: 340, x2: 820, y2: 360 }',
+                    '  ]',
+                    '',
+                    '  function collideWithPlatforms() {',
+                    '    var i',
+                    '    var oldY = playerState.y',
+                    '    var onGround = false',
+                    '',
+                    '    for (i = 0; i < worldTiles.length; i++) {',
+                    '      var p = worldTiles[i]',
+                    '      if (p.kind !== \"platform\") continue',
+                    '      if (playerState.x >= p.x1 && playerState.x <= p.x2) {',
+                    '        if (oldY <= p.y1 && playerState.y + playerState.vy >= p.y1) {',
+                    '          playerState.y = p.y1',
+                    '          playerState.vy = 0',
+                    '          onGround = true',
+                    '          playerState.jumpsLeft = config.player.maxJumps',
+                    '        }',
+                    '      }',
+                    '    }',
+                    '',
+                    '    playerState.isGrounded = onGround',
+                    '    if (!onGround && playerState.vy > 3) {',
+                    '      playerState.vy = clamp(playerState.vy, -12, 12)',
+                    '    }',
+                    '  }',
+                    '',
+                    '  function isOutOfBounds() {',
+                    '    return playerState.y > 360 || playerState.x < 0 || playerState.x > world.terminalX',
+                    '  }',
+                    '',
+                    '  function nearestCheckpoint() {',
+                    '    var best = world.checkpoints[0]',
+                    '    var i',
+                    '    for (i = 0; i < world.checkpoints.length; i++) {',
+                    '      var c = world.checkpoints[i]',
+                    '      if (playerState.x >= c[0]) best = c',
+                    '    }',
+                    '    return best',
+                    '  }',
+                    '',
+                    '  function dieAndRespawn() {',
+                    '    var p = nearestCheckpoint()',
+                    '    playerState.x = p[0] + 16',
+                    '    playerState.y = p[1] - 24',
+                    '    playerState.vx = 0',
+                    '    playerState.vy = 0',
+                    '    playerState.isAlive = false',
+                    '    setTimeout(function() {',
+                    '      playerState.isAlive = true',
+                    '    }, 500)',
+                    '  }',
+                    '',
+                    '  function inputTick(input) {',
+                    '    if (!input.left && !input.right) {',
+                    '      playerState.vx *= world.friction || config.player.friction',
+                    '    }',
+                    '    if (input.left) {',
+                    '      playerState.vx -= config.player.acceleration',
+                    '      playerState.facing = -1',
+                    '    }',
+                    '    if (input.right) {',
+                    '      playerState.vx += config.player.acceleration',
+                    '      playerState.facing = 1',
+                    '    }',
+                    '    if (input.jump && playerState.jumpsLeft > 0) {',
+                    '      playerState.vy = -config.player.jumpImpulse',
+                    '      playerState.jumpsLeft--',
+                    '      input.jump = false',
+                    '    }',
+                    '    playerState.vx = clamp(playerState.vx, -config.player.speed, config.player.speed)',
+                    '    playerState.vy += world.gravity',
+                    '',
+                    '    playerState.x += playerState.vx',
+                    '    playerState.y += playerState.vy',
+                    '',
+                    '    collideWithPlatforms()',
+                    '    if (isOutOfBounds()) dieAndRespawn()',
+                    '  }',
+                    '',
+                    '  function collect(collectibles) {',
+                    '    var i',
+                    '    var count = 0',
+                    '    for (i = 0; i < collectibles.length; i++) {',
+                    '      var c = collectibles[i]',
+                    '      if (!c || c.collected) continue',
+                    '      if (Math.abs(playerState.x - c.x) < 20 && Math.abs(playerState.y - c.y) < 20) {',
+                    '        c.collected = true',
+                    '        count++',
+                    '      }',
+                    '    }',
+                    '    if (count) {',
+                    '      playerState.collected += count',
+                    '      return count',
+                    '    }',
+                    '    return 0',
+                    '  }',
+                    '',
+                    '  window.gameCode = {',
+                    '    playerState: playerState,',
+                    '    inputTick: inputTick,',
+                    '    collect: collect,',
+                    '    hasWon: function() { return playerState.x >= config.player.terminalX && playerState.y <= config.player.terminalY }',
                     '  }',
                     '})()'
                 ]
@@ -702,11 +829,12 @@
             {
                 special: 'want-to-play',
                 prompt: 'Let\'s play!',
-                ai: 'The game code is in src/, but you can\'t play it yet — we still need a build. That\'s the step where source files turn into something you can open in a browser and actually play.'
+                ai: 'The game code is ready, but you can\'t play it yet — we still need a build. That\'s the step where files are bundled into something you can open in a browser and actually play.'
             }
         ]
     }
     WORKSHOP_GAME.agentSteps[0].lines = WORKSHOP_GAME.ideaLines
+    WORKSHOP_GAME.agentSteps[1].lines = WORKSHOP_GAME.todoLines
 
     function reconcileStoryDemos() {
         var demos = storyFlow.demos || {}
@@ -733,7 +861,7 @@
         { k: 'cmd', v: 'open tests/index.html' },
         { k: 'dim', v: 'Platform Hopper — running test suite…' },
         { k: 'ok',  v: '✓ store — dispatch, replay, tick order' },
-        { k: 'ok',  v: '✓ player.js — run / jump on platforms' },
+        { k: 'ok',  v: '✓ code.js — run / jump on platforms' },
         { k: 'ok',  v: '✓ sparks + exit — matches the plan' },
         { k: 'pass', v: '12 passed, 0 failed' }
     ]
@@ -744,7 +872,7 @@
         { k: 'ok',  v: '✓ config linked' },
         { k: 'ok',  v: '✓ systems bundled' },
         { k: 'ok',  v: '✓ assets ready' },
-        { k: 'pass', v: 'Build complete — src/index.html is playable' }
+        { k: 'pass', v: 'Build complete — index.html is playable' }
     ]
 
     function buildAgentChatMessages(steps, sendCount) {
@@ -753,14 +881,7 @@
         for (i = 0; i < sendCount; i++) {
             var step = steps[i]
             messages.push({ who: 'user', text: step.prompt })
-            if (step.special === 'design-and-plan') {
-                messages.push({ who: 'tool', text: 'Read  game-idea.txt' })
-                messages.push({ who: 'ai', text: step.aiExplain })
-                messages.push({ who: 'tool', text: 'Create  ' + step.mdFile + '   (new file)' })
-                messages.push({ who: 'tool', text: 'Delete  ' + step.deleteFile })
-                messages.push({ who: 'tool', text: 'Create  ' + step.todoFile + '   (new file)' })
-                messages.push({ who: 'ai', text: step.aiDone })
-            } else if (step.special === 'want-to-play') {
+            if (step.special === 'want-to-play') {
                 messages.push({ who: 'ai', text: step.ai })
             } else {
                 messages.push({ who: 'tool', text: step.tool + '   (new file)' })
@@ -775,26 +896,7 @@
         var i
         for (i = 0; i < sendCount; i++) {
             var step = steps[i]
-            if (step.special === 'design-and-plan') {
-                var kept = []
-                var f
-                for (f = 0; f < files.length; f++) {
-                    if (files[f].name !== step.deleteFile) kept.push(files[f])
-                }
-                files = kept
-                files.push({
-                    name: step.mdFile,
-                    lines: step.mdLines.slice(),
-                    icon: step.mdIcon,
-                    isNew: false
-                })
-                files.push({
-                    name: step.todoFile,
-                    lines: step.todoLines.slice(),
-                    icon: step.todoIcon,
-                    isNew: false
-                })
-            } else if (step.file) {
+            if (step.file) {
                 files.push({
                     name: step.file,
                     lines: (step.lines || []).slice(),
@@ -1212,7 +1314,7 @@
         var panel = $('tutorial-celebrate')
         if (!panel) return
         panel.hidden = false
-        if (!quiet) burstConfetti($('tutorial-confetti'))
+        if (!quiet) burstFireworks($('tutorial-confetti'))
         // Wait for layout after hidden=false so scroll targets the real position.
         requestAnimationFrame(function() {
             requestAnimationFrame(function() {
@@ -1623,37 +1725,6 @@
             setTimeout(finishRemove, 280)
         }
 
-        function runDesignAndPlan(step, done) {
-            var ideaIdx = -1
-            for (var k = 0; k < agentFiles.length; k++) {
-                if (agentFiles[k].name === 'game-idea.txt') ideaIdx = k
-            }
-            if (ideaIdx >= 0) selectFile(ideaIdx, false)
-
-            typeBubble(chat, 'tool', 'Read  game-idea.txt', function() {
-                typeBubble(chat, 'ai', step.aiExplain, function() {
-                    typeBubble(chat, 'tool', 'Create  ' + step.mdFile + '   (new file)', function() {
-                        setTimeout(function() {
-                            pushAgentFile(step.mdFile, step.mdLines, step.mdIcon)
-                            typeBubble(chat, 'tool', 'Delete  ' + step.deleteFile, function() {
-                                setTimeout(function() {
-                                    removeAgentFile(step.deleteFile, function() {
-                                        typeBubble(chat, 'tool', 'Create  ' + step.todoFile + '   (new file)', function() {
-                                            setTimeout(function() {
-                                                pushAgentFile(step.todoFile, step.todoLines, step.todoIcon)
-                                                selectFile(agentFiles.length - 1, true)
-                                                typeBubble(chat, 'ai', step.aiDone, done)
-                                            }, 320)
-                                        })
-                                    })
-                                }, 300)
-                            })
-                        }, 320)
-                    })
-                })
-            })
-        }
-
         function send() {
             if (busy || !canUseStoryStep(2) || !guided.isComplete()) return
             var step = steps[sendCount]
@@ -1665,14 +1736,6 @@
             input.disabled = true
             addBubble(chat, 'user', text)
             guided.clearAfterSend()
-
-            if (step.special === 'design-and-plan') {
-                sendCount++
-                runDesignAndPlan(step, function() {
-                    afterAgentRound()
-                })
-                return
-            }
 
             if (step.special === 'want-to-play') {
                 sendCount++
@@ -1850,7 +1913,7 @@
                     { t: 0,   k: 'cmd', v: 'open tests/index.html' },
                     { t: 400, k: 'dim', v: 'Platform Hopper — running test suite…' },
                     { t: 900, k: 'ok',  v: '✓ store — dispatch, replay, tick order' },
-                    { t: 1400, k: 'ok', v: '✓ player.js — run / jump on platforms' },
+                    { t: 1400, k: 'ok', v: '✓ code.js — run / jump on platforms' },
                     { t: 1900, k: 'ok', v: '✓ sparks + exit — matches the plan' },
                     { t: 2400, k: 'pass', v: '12 passed, 0 failed' }
                 ]
@@ -1871,7 +1934,7 @@
                     { t: 900, k: 'ok',  v: '✓ config linked' },
                     { t: 1400, k: 'ok', v: '✓ systems bundled' },
                     { t: 1900, k: 'ok', v: '✓ assets ready' },
-                    { t: 2400, k: 'pass', v: 'Build complete — src/index.html is playable' }
+                    { t: 2400, k: 'pass', v: 'Build complete — index.html is playable' }
                 ]
                 runTermScript(script, done)
             })
@@ -2042,7 +2105,7 @@
             guided.clearAfterSend()
 
             playSteps(chat, [
-                'Open browser  file:///…/src/index.html — built game',
+                'Open browser  file:///…/index.html — built game',
                 'Play  Platform Hopper — collect factory sparks',
                 'Check  does the built game match DESIGN.md?'
             ], function() {
@@ -2088,7 +2151,7 @@
         if (isStoryDone(4)) {
             chat.innerHTML = ''
             addBubble(chat, 'user', WORKSHOP_GAME.playtestPrompt)
-            addBubble(chat, 'tool', 'Open browser  file:///…/src/index.html — built game')
+            addBubble(chat, 'tool', 'Open browser  file:///…/index.html — built game')
             addBubble(chat, 'tool', 'Play  Platform Hopper — collect factory sparks')
             addBubble(chat, 'tool', 'Check  does the built game match DESIGN.md?')
             addBubble(chat, 'ai', 'Looks good — 3 sparks collected and you reached the exit.')

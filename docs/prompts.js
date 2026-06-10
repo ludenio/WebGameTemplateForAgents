@@ -109,12 +109,12 @@
             'Publish my browser game on the web with Surge so I can send a playable link to a friend.',
             '',
             'Important:',
-            '- the game is inside the src folder;',
-            '- publish only ./src, not the whole project folder;',
+            '- the game is in the project root (game files only);',
+            '- publish only the game files, not the whole repository;',
             '- use your tools and terminal access to do the publishing for me, not just explain the commands;',
             '- first check whether node and npx are installed;',
             '- if node or npx is missing, help me install the Node.js LTS version for my operating system, then check again;',
-            '- when ready, run: npx --yes surge ./src ' + domain + ';',
+            '- when ready, run: npx --yes surge ./ ' + domain + ';',
             '- if my agent app asks me to approve a command, wait for my approval;',
             '- if Surge asks for email or domain, you may enter the values below;'
         ]

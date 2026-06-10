@@ -156,7 +156,7 @@
                 <div class="fake-browser show game-preview" id="p-browser">
                     <div class="fb-bar">
                         <span class="fb-dots"><i></i><i></i><i></i></span>
-                        <span class="fb-address">file:///…/src/index.html — Platform Hopper</span>
+                        <span class="fb-address">file:///…/index.html — Platform Hopper</span>
                         <span class="fb-reload">&#10227;</span>
                     </div>
                     <div class="fb-body gp-body">
@@ -191,7 +191,7 @@
         </div>
 
         <div class="tutorial-celebrate" id="tutorial-celebrate" hidden>
-            <div class="tutorial-celebrate-confetti" id="tutorial-confetti" aria-hidden="true"></div>
+            <div class="tutorial-celebrate-confetti fireworks-host" id="tutorial-confetti" aria-hidden="true"></div>
             <div class="tutorial-celebrate-card">
                 <div class="tutorial-celebrate-icon" aria-hidden="true"><img src="Nikol.ai.svg" alt=""><span class="tutorial-celebrate-check">&#10003;</span></div>
                 <h3 class="tutorial-celebrate-title">Chat vs agent</h3>
@@ -311,12 +311,14 @@
 
     <!-- ============ TAB: Checklist ============ -->
     <section class="tab-section panel" data-tab="steps">
-        <h2>Checklist</h2>
+        <div class="panel-head">
+            <h2>Checklist</h2>
+            <button class="reset-link" id="reset-checklist">Reset progress</button>
+        </div>
         <p class="hint">Check off what you&rsquo;ve done. Progress is saved in this browser. Come back here at the end of the workshop.</p>
 
         <div class="progress"><span id="progress-bar"></span></div>
         <ul class="checklist" id="checklist"></ul>
-        <button class="reset-link" id="reset-checklist">Reset checklist</button>
 
         <div class="tutorial-celebrate" id="steps-celebrate" hidden>
             <div class="tutorial-celebrate-confetti fireworks-host" id="steps-confetti" aria-hidden="true"></div>
