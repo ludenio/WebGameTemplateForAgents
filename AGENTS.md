@@ -55,6 +55,8 @@ Read approved `DESIGN.md` + `ARCHITECTURE.md`. Write `TODO.md` — ordered, atom
 ### Phase 3 → Implementation
 Execute `TODO.md` sequentially. Mark each task done. Verify `ARCHITECTURE.md` compliance after each task.
 
+At the end of implementation, create or update `.gitignore` so only project files are committed — exclude temporary test files, logs, debug output, and OS junk.
+
 ### Phase 4 → Testing
 Write tests in `tests/` verifying: feature correctness against `DESIGN.md`, deterministic replay, architecture compliance. Run tests by opening `tests/index.html`. If any test fails — fix code, re-run all tests. Repeat until all pass.
 

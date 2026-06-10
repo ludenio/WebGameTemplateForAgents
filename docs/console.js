@@ -34,10 +34,12 @@
         ] },
         { id: 'open-agent', text: 'Open the extracted project folder in your agent app' },
         { id: 'first-prompt', text: 'Write and send your new game prompt to the agent', tab: 'first' },
-        { id: 'design',  text: 'Review and approve the design (DESIGN.md)', copy: { label: 'Copy: design approved', phrase: 'design' } },
-        { id: 'plan',    text: 'Approve the task plan (TODO.md)', copy: { label: 'Copy: plan approved, build it', phrase: 'plan' } },
-        { id: 'play',    text: 'Open the game and play it', links: [
-            { href: '..' + '/' + 'src' + '/' + 'index.html', label: 'Open the game' }
+        { id: 'design',  text: 'Review and approve the design (DESIGN.md)', copy: { label: 'Copy: "I approve, continue."', phrase: 'design' } },
+        { id: 'plan',    text: 'Approve the task plan (TODO.md)', copy: { label: 'Copy: "I approve, continue."', phrase: 'plan' } },
+        { id: 'play',    text: 'Open the game and play it — double-click src/index.html in your project folder', links: [
+            // Relative link only resolves when the console itself is opened
+            // from the extracted project folder, not from the hosted site.
+            { href: '..' + '/' + 'src' + '/' + 'index.html', label: 'Open the game', localOnly: true }
         ] },
         { id: 'iterate', text: 'Send a change prompt to the agent', tab: 'next' },
         { id: 'publish', text: 'Publish your game online', tab: 'publish' },
@@ -484,7 +486,14 @@
                 li.appendChild(label)
 
                 var hasTab = !!item.tab
-                var hasLinks = !!(item.links && item.links.length)
+                var visibleLinks = []
+                if (item.links) {
+                    for (var j = 0; j < item.links.length; j++) {
+                        if (item.links[j].localOnly && window.location.protocol !== 'file:') continue
+                        visibleLinks.push(item.links[j])
+                    }
+                }
+                var hasLinks = visibleLinks.length > 0
                 var hasCopy = !!(item.copy && item.copy.label && item.copy.phrase)
                 if (hasTab || hasLinks || hasCopy) {
                     var actions = document.createElement('div')
@@ -514,8 +523,8 @@
                     }
 
                     if (hasLinks) {
-                        for (var k = 0; k < item.links.length; k++) {
-                            var link = item.links[k]
+                        for (var k = 0; k < visibleLinks.length; k++) {
+                            var link = visibleLinks[k]
                             var a = document.createElement('a')
                             a.className = 'checklist-tab-btn checklist-link-btn'
                             a.href = link.href

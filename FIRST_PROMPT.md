@@ -4,7 +4,25 @@ Write your idea in normal language. The agent will turn it into a design, a task
 
 **Copy everything between the `---` lines below** and paste it into your first message to the AI agent. Replace the placeholder with your game concept.
 
-> Prefer a form you can click instead of editing this file? Open the **[Workshop Console](https://ludenio.github.io/WebGameTemplateForAgents/)** — tab **1. Create your first game** assembles and copies this exact prompt for you.
+> Prefer a form you can click instead of editing this file? Open the **[Workshop Console](https://ludenio.github.io/WebGameTemplateForAgents/)** — the **New game prompt** tab assembles and copies this exact prompt for you.
+
+## Concept Quality Checklist
+
+Before sending, check that your concept answers these five questions:
+
+- [ ] **What does the player do moment-to-moment?** (move, jump, collect, aim, dodge...)
+- [ ] **How does the player win?** (reach a score, find the exit, survive N waves...)
+- [ ] **How does the player lose?** (timer runs out, health hits zero, three misses...)
+- [ ] **What does it look like?** (top-down, side view; bright shapes, dungeon tiles...)
+- [ ] **What makes it fun?** (speed, risk, exploration, mastery...)
+
+**Weak concept** (the agent will have to guess almost everything):
+
+> A game about a wizard. It should be fun and have magic.
+
+**Good concept** (specific enough to design from):
+
+> Top-down arcade. A wizard runs around a small arena and collects mana crystals while slow ghosts chase him. Picking up 10 crystals wins the round; getting touched by a ghost three times loses. Each crystal collected makes ghosts slightly faster. Bright, simple shapes, glowing effects on crystals.
 
 ---
 
@@ -39,9 +57,5 @@ Follow the development workflow from `AGENTS.md`:
 4. Write and run tests — fix any failures, re-run until all pass
 
 Start with Phase 1 — write the game design document.
-
-## Post work .gitignore
-
-Create or update the `.gitignore` file so that only project files are committed to the Git repository, without temporary test files, logs, debug symbols, etc.
 
 ---

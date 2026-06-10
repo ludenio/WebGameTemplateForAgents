@@ -4,7 +4,7 @@ Use this template when you want to change, add, or remove something in a game th
 
 **Copy everything between the `---` lines below** and paste it into your message to the coding agent. Replace the placeholder with your change request.
 
-> Prefer a form you can click instead of editing this file? Open the **[Workshop Console](https://ludenio.github.io/WebGameTemplateForAgents/)** — tab **2. Change a game** assembles and copies this exact prompt for you.
+> Prefer a form you can click instead of editing this file? Open the **[Workshop Console](https://ludenio.github.io/WebGameTemplateForAgents/)** — the **Change prompt** tab assembles and copies this exact prompt for you.
 
 ---
 

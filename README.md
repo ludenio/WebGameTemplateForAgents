@@ -4,17 +4,15 @@ A project template for building browser games with the help of a coding agent. U
 
 ## New to Coding Agents?
 
-If you have little or no technical background, start with the [Workshop Console](https://ludenio.github.io/WebGameTemplateForAgents/) — an interactive page with copy-paste prompts — or read [`AGENTS_WORKSHOP_GUIDE.md`](AGENTS_WORKSHOP_GUIDE.md). It is a beginner-friendly step-by-step workshop guide that explains what GitHub, GitHub Desktop, coding agents, and publishing are, then walks you from a first idea to a playable browser game link.
-
-The guide is written for people who are just getting comfortable with AI agents and want to understand the workflow without needing to read code first.
+If you have little or no technical background, start with the [Workshop Console](https://ludenio.github.io/WebGameTemplateForAgents/) — an interactive page that builds every prompt for you and tracks your progress with a checklist — or read [`AGENTS_WORKSHOP_GUIDE.md`](AGENTS_WORKSHOP_GUIDE.md), a beginner-friendly step-by-step walkthrough from a first idea to a playable browser game link.
 
 The guide is written for people who are just getting comfortable with AI agents and want to understand the workflow without needing to read code first.
 
 ## How It Works
 
-1. Clone this repo
-2. Open in an agent-enabled editor or CLI
-3. Open `FIRST_PROMPT.md`, write your game concept in the placeholder
+1. Get the template: download the [ZIP](https://github.com/ludenio/WebGameTemplateForAgents/archive/refs/heads/main.zip) and extract it, clone the repo, or click **Use this template** on GitHub
+2. Open the folder in an agent-enabled editor or CLI
+3. Build your first prompt in the [Workshop Console](https://ludenio.github.io/WebGameTemplateForAgents/) (**New game prompt** tab) — or open `FIRST_PROMPT.md` and write your game concept in the placeholder
 4. Copy the prompt into the agent chat
 5. The coding agent reads the rules and follows a 4-phase workflow:
 
@@ -27,7 +25,7 @@ The guide is written for people who are just getting comfortable with AI agents 
 
 The coding agent checks every change against the architecture and design rules. If your request would violate a rule, it warns you and proposes alternatives before writing any code.
 
-For subsequent changes (new features, balance tweaks, mechanic removals), use `NEXT_ITERATION_PROMPT.md` — it ensures the agent updates `DESIGN.md` first, then plans and implements, rather than jumping straight to code.
+For subsequent changes (new features, balance tweaks, mechanic removals), use the console's **Change prompt** tab or `NEXT_ITERATION_PROMPT.md` — it ensures the agent updates `DESIGN.md` first, then plans and implements, rather than jumping straight to code.
 
 ## What's Inside
 
