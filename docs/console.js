@@ -27,10 +27,10 @@
         { id: 'extract', text: 'Extract the ZIP into a folder on your computer — do not edit files inside the archive' },
         { id: 'concept', text: 'Understand how an agent differs from a plain chat', tab: 'intro' },
         { id: 'agent-account', text: 'Create an AI agent app account (e.g. Cursor)', links: [
-            { href: 'https://cursor.com/referral?code=2Z6ITGMBUZ2B', label: 'Sign up for Cursor' }
+            { href: 'https://cursor.com/referral?code=ATYASOC0WCMF', label: 'Sign up for Cursor' }
         ] },
         { id: 'agent-app', text: 'Install an AI agent app (e.g. Cursor)', links: [
-            { href: 'https://cursor.com/referral?code=2Z6ITGMBUZ2B', label: 'Download Cursor' }
+            { href: 'https://cursor.com/referral?code=ATYASOC0WCMF', label: 'Download Cursor' }
         ] },
         { id: 'open-agent', text: 'Open the extracted project folder in your agent app' },
         { id: 'first-prompt', text: 'Write and send your new game prompt to the agent', tab: 'first' },
