@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Workshop Kickoff — Download and Unzip</title>
-    <meta name="description" content="Scan the QR code or open the link to download the workshop project sources. Extract the ZIP before you start.">
+    <meta name="description" content="On your laptop: download the workshop ZIP, extract it, and open docs/index.html.">
     <meta name="author" content="ludenio">
     <meta name="theme-color" content="#14120b">
     <meta name="color-scheme" content="dark">
@@ -23,23 +23,87 @@
 
     <main class="kickoff-main">
         <header class="kickoff-hero">
+            <p class="kickoff-badge">Get set up before we start</p>
             <img class="kickoff-mascot" src="Nikol.ai.svg" alt="" width="100" height="84">
+            <h1 class="kickoff-title">Game Development with AI Agents</h1>
         </header>
 
-        <section class="kickoff-panel" aria-label="Download link">
-            <a class="kickoff-qr-link" href="https://bit.ly/ai_agents_workshop" target="_blank" rel="noopener noreferrer">
-                <img class="kickoff-qr" src="qr.png" alt="QR code — download workshop sources" width="480" height="480">
-            </a>
-
+        <section class="kickoff-panel" aria-label="Workshop setup">
+            <p class="kickoff-cue">On your laptop — type this in the browser</p>
             <a class="kickoff-url" href="https://bit.ly/ai_agents_workshop" target="_blank" rel="noopener noreferrer">bit.ly/ai_agents_workshop</a>
-
-            <ol class="kickoff-steps">
-                <li>Extract the ZIP into a folder — do not edit files inside the archive.</li>
-                <li>Open <code>docs/index.html</code> in your browser to start the Workshop Console.</li>
-            </ol>
         </section>
+
+        <ol class="kickoff-steps" aria-label="Setup steps">
+            <li>
+                <span class="kickoff-step-num">01</span>
+                <strong>Download the ZIP</strong>
+                <span class="kickoff-step-sub">from the link above</span>
+            </li>
+            <li>
+                <span class="kickoff-step-num">02</span>
+                <strong>Unzip it</strong>
+                <span class="kickoff-step-sub">anywhere is fine</span>
+            </li>
+            <li>
+                <span class="kickoff-step-num">03</span>
+                <strong>Open <code>docs/index.html</code></strong>
+                <span class="kickoff-step-sub">in your browser</span>
+            </li>
+        </ol>
     </main>
 
 </div>
+<script>
+;(function () {
+    'use strict'
+
+    function fitKickoffUrl() {
+        var url = document.querySelector('.kickoff-url')
+        var wrap = document.querySelector('.kickoff-wrap')
+        if (!url || !wrap) return
+
+        var maxW = wrap.clientWidth
+        if (maxW <= 0) return
+
+        var maxH = Math.floor(window.innerHeight * 0.14)
+        var lo = 12
+        var hi = Math.min(300, maxH)
+        var best = lo
+
+        while (lo <= hi) {
+            var mid = (lo + hi) >> 1
+            url.style.fontSize = mid + 'px'
+            if (url.scrollWidth <= maxW) {
+                best = mid
+                lo = mid + 1
+            } else {
+                hi = mid - 1
+            }
+        }
+
+        url.style.fontSize = best + 'px'
+    }
+
+    function init() {
+        fitKickoffUrl()
+        window.addEventListener('resize', fitKickoffUrl)
+
+        var wrap = document.querySelector('.kickoff-wrap')
+        if (window.ResizeObserver && wrap) {
+            new ResizeObserver(fitKickoffUrl).observe(wrap)
+        }
+
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(fitKickoffUrl)
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init)
+    } else {
+        init()
+    }
+})()
+</script>
 </body>
 </html>
