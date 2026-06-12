@@ -24,7 +24,10 @@
         { id: 'download', text: 'Download the project sources (ZIP archive)', links: [
             { href: SOURCE_ZIP_URL, label: 'Download sources' }
         ] },
-        { id: 'extract', text: 'Extract the ZIP into a folder on your computer — do not edit files inside the archive' },
+        { id: 'extract', text: 'Extract the ZIP file to a folder on your computer. ⚠️ If you\'re using Windows, don\'t open the folder directly from inside the ZIP file.' },
+        { id: 'open-console', text: 'Open docs/index.html in your browser', links: [
+            { href: 'index.html', label: 'Open workshop console', localOnly: true }
+        ] },
         { id: 'concept', text: 'Understand how an agent differs from a plain chat', tab: 'intro' },
         { id: 'agent-account', text: 'Create an AI agent app account (e.g. Cursor)', links: [
             { href: 'http://cursor.com/signup', label: 'Sign up for Cursor' }
