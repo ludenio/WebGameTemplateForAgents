@@ -425,29 +425,6 @@
         try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)) } catch (e) {}
     }
 
-    function markChecklistDone(id) {
-        var cb = $('chk-' + id)
-        if (!cb || cb.checked) return
-        cb.checked = true
-        if (cb.parentNode) cb.parentNode.classList.add('done')
-        var state = loadChecklistState()
-        state[id] = true
-        saveChecklistState(state)
-        updateProgress(state)
-    }
-
-    function uncheckChecklistItem(id) {
-        var cb = $('chk-' + id)
-        if (!cb || !cb.checked) return
-        cb.checked = false
-        if (cb.parentNode) cb.parentNode.classList.remove('done')
-        var state = loadChecklistState()
-        state[id] = false
-        saveChecklistState(state)
-        updateProgress(state)
-        refreshStepsCelebrate(state)
-    }
-
     function updateProgress(state) {
         var done = 0
         for (var i = 0; i < checklistItems.length; i++) {
@@ -1198,7 +1175,6 @@
         }
         if (n === 4) {
             showTutorialComplete(false)
-            markChecklistDone('concept')
         } else {
             unlockStoryStep(n + 1)
         }
@@ -1400,7 +1376,6 @@
 
         var step1 = storyStage(1)
         if (step1) step1.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        uncheckChecklistItem('concept')
         unlockStoryStep(1, false)
     }
 
@@ -1419,7 +1394,6 @@
 
     function syncStoryChecklist() {
         if (!isStoryDone(4)) return
-        markChecklistDone('concept')
         showTutorialComplete(true)
     }
 
